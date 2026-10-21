@@ -1,0 +1,20 @@
+# MemGuard: AI Agent Memory Governance & Provenance Firewall Platform
+langgraph>=0.2.0
+langchain-core>=0.3.0
+qdrant-client>=1.9.0
+sentence-transformers>=3.0.0
+transformers>=4.40.0
+torch>=2.2.0
+networkx>=3.2.0
+streamlit>=1.35.0
+pydantic>=2.7.0
+pydantic-settings>=2.2.0
+fastapi>=0.111.0
+uvicorn>=0.30.0
+numpy>=1.26.0
+openai>=1.30.0
+requests>=2.31.0
+python-dotenv>=1.0.1
+plotly>=5.22.0
+matplotlib>=3.8.0
+
