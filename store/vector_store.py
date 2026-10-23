@@ -165,13 +165,13 @@ class QdrantVectorStoreWrapper:
 
             query_filter = Filter(must=must_filters)
 
-            search_response = self.client.search(
+            search_response = self.client.query_points(
                 collection_name=self.collection_name,
-                query_vector=query_vector,
+                query=query_vector,
                 query_filter=query_filter,
                 limit=top_k,
                 with_payload=True,
-            )
+            ).points
 
             results: List[Dict[str, Any]] = []
             for hit in search_response:
