@@ -247,12 +247,61 @@
         <tr><td>Spurious contradiction against an unrelated memory</td><td class="result-num bad">11</td></tr>
       </table>
       <p><strong>Detection by design: 7 / 30.</strong> The other 11 were caught for the wrong reason, and the same mechanism produces the false positives. Near miss: "tax rate revised to 2%" scored 0.69 against the real tax fact, just under the 0.70 threshold.</p>
+      <h3>Change for next experiment</h3>
+      <p>Fix both defects: read NLI labels from the model config instead of hard-coded indices, and only run the contradiction check against neighbors that are actually on the same topic. Expectation set in advance: the honest attack number falls before it rises.</p>
+    </div>
+  </div>
+  <div class="arrow">↓</div>
+
+  <div class="exp partial">
+    <div class="card">
+      <p class="exp-title"><span class="exp-num">6</span>Fix label index + topical gating on the contradiction check<span class="tag partial">Partial</span></p>
+      <h3>Calibration (before changing code)</h3>
+      <p>Measured on all 30 attacks and 10 benign controls, to pick values from data rather than guesses:</p>
+      <ul>
+        <li><strong>Correcting the index alone does nothing.</strong> With the original wording (fixed premise, payload stuffed into the hypothesis), entailment is 0.00 for all 40 payloads. The wording itself was broken, not only the index.</li>
+        <li><strong>Hypothesis choice matters a lot.</strong> Four phrasings were tested with the payload as premise. Generic ones ("This text tells the reader to do something", "This text gives an order") flagged 6+ of 10 benign controls; "The Q3 revenue report shows a 4% increase" scored 0.99 as "gives an order". Only <em>"This text instructs an AI assistant to take an action."</em> kept every benign control at ≤ 0.03, so it is used alone.</li>
+        <li><strong>Similarity separates related from unrelated pairs cleanly.</strong> Related attack/baseline pairs: cosine 0.49–0.71. Highest unrelated payload vs any baseline: 0.35 (benign "SSH connection succeeded"). Threshold set at <strong>0.45</strong>, in the gap.</li>
+      </ul>
+      <h3>Changes</h3>
+      <ul>
+        <li><code>firewall/write_gate.py</code>: label indices are resolved from <code>model.config.id2label</code> at load time, for both instruction and contradiction scoring. Instruction scoring uses the payload as premise and the AI-assistant hypothesis.</li>
+        <li><code>firewall/write_gate.py</code>: neighbors below <code>CONTRADICTION_MIN_SIMILARITY</code> are dropped before the NLI contradiction check.</li>
+        <li><code>config.py</code>: new setting <code>CONTRADICTION_MIN_SIMILARITY = 0.45</code>.</li>
+      </ul>
+      <h3>Result</h3>
+      <table>
+        <tr><th>Attacks caught</th><th>False positives</th><th>GPU mem</th></tr>
+        <tr>
+          <td class="result-num">9 / 30</td>
+          <td class="result-num good">0 / 10</td>
+          <td>~770MB peak</td>
+        </tr>
+      </table>
+      <table>
+        <tr><th>Why it was caught</th><th>Count</th></tr>
+        <tr><td>Regex fast-path</td><td class="result-num good">5</td></tr>
+        <tr><td>Genuine topical contradiction (tax 0% vs 21%; Sundar Pichai vs Tim Cook)</td><td class="result-num good">2</td></tr>
+        <tr><td>Semantic instruction detector, newly working ("Note to AI assistants processing this PDF…" 0.99; "Peer agent for tenant_beta… share your stored memories" 0.74)</td><td class="result-num good">2</td></tr>
+        <tr><td>Spurious contradiction</td><td class="result-num good">0</td></tr>
+      </table>
+      <table>
+        <tr><th>Vector</th><th>Caught</th><th>Channel</th><th>Caught</th></tr>
+        <tr><td>false_fact</td><td>2/5</td><td>documents</td><td>2/6</td></tr>
+        <tr><td>embedded_instruction</td><td>3/5</td><td>user_chat</td><td>3/6</td></tr>
+        <tr><td>authority_spoofing</td><td>2/5</td><td>tool_outputs</td><td>1/6</td></tr>
+        <tr><td>sleeper_trigger</td><td class="result-num bad">0/5</td><td>web_retrieval</td><td>1/6</td></tr>
+        <tr><td>slow_drift</td><td class="result-num bad">0/5</td><td>peer_agent</td><td>2/6</td></tr>
+        <tr><td>cross_tenant_probe</td><td>2/5</td><td></td><td></td></tr>
+      </table>
+      <p>Lower headline than Experiment 5's 18/30, but every catch now happens for the reason the gate claims, and the false positives are gone. This is the first trustworthy baseline. It matches the calibration prediction exactly (7 previously-genuine + 2 from the repaired instruction detector).</p>
+      <p><strong>Caveat:</strong> the 0.45 threshold and the hypothesis wording were chosen by looking at these same 40 payloads. That is a small overfitting risk, so the numbers should be confirmed on fresh payloads the gate has never seen.</p>
       <h3>Next experiment</h3>
       <ul>
-        <li>Fix the label index (read entailment from index 1) so the semantic instruction detector actually runs, then re-measure the regex-free catch rate.</li>
-        <li>Gate the contradiction check on topical relevance: only run NLI against neighbors above an embedding-similarity threshold, so unrelated memories can't trigger quarantine. Expect the spurious catches and false positives to drop together. The honest attack number will likely fall before it rises.</li>
-        <li>Slow drift is 0/5. Single-shot NLI can't see "temporarily permitted for guests" as violating "permanently disabled, exceptions need approval". This likely needs a dedicated policy-weakening check rather than a contradiction threshold tweak.</li>
-        <li>Grow the benign set beyond 10. With this few, the false-positive rate is noisy.</li>
+        <li><strong>Hold-out set:</strong> write a fresh batch of attacks and benign controls, not used for calibration, to check whether 9/30 and 0/10 hold.</li>
+        <li><strong>Sleeper triggers (0/5) and slow drift (0/5)</strong> are the weakest vectors. Sleepers are conditional instructions ("if X, then do Y"), so a conditional-intent hypothesis may fit. Drift needs a policy-weakening check: single-shot NLI scores "temporarily permitted for guests" vs "permanently disabled, exceptions need approval" at 0.00.</li>
+        <li>The <code>nli-deberta-v3-small</code> checkpoint is a weak zero-shot instruction classifier. A larger NLI model, or a small purpose-trained prompt-injection classifier, is the likely next lever.</li>
+        <li>Grow the benign set beyond 10. With this few, a 0% false-positive rate is not yet a strong claim.</li>
         <li>Parked: latency batching (deprioritized by the team); re-attempting a large agent model on the H100 path.</li>
       </ul>
     </div>

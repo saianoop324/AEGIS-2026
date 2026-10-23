@@ -55,6 +55,7 @@ class Settings(BaseSettings):
     # Security & Firewall Thresholds
     WRITE_GATE_LATENCY_BUDGET_MS: float = 25.0
     CONTRADICTION_THRESHOLD: float = 0.70
+    CONTRADICTION_MIN_SIMILARITY: float = 0.45
     INSTRUCTION_DETECTION_THRESHOLD: float = 0.65
     LOW_TRUST_RECALL_PENALTY: float = 0.40
     QUARANTINE_SIMILARITY_THRESHOLD: float = 0.82

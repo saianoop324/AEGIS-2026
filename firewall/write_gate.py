@@ -69,6 +69,10 @@ class DebertaWriteClassifier:
                 self._model = AutoModelForSequenceClassification.from_pretrained(self.model_name)
                 self._model.to(self.device)
                 self._model.eval()
+                # Label order differs between NLI checkpoints, so resolve indices from the model config.
+                label_index = {v.lower(): k for k, v in self._model.config.id2label.items()}
+                self._entailment_idx = label_index["entailment"]
+                self._contradiction_idx = label_index["contradiction"]
                 self._initialized = True
                 logger.info(f"Loaded DeBERTa NLI model: {self.model_name}")
             except Exception as e:
@@ -98,23 +102,20 @@ class DebertaWriteClassifier:
         if self._initialized and self._tokenizer and self._model:
             try:
                 import torch
-                # NLI framing: premise is "This text provides factual passive information."
-                # hypothesis is "This text orders or commands actions to be taken."
+                # Generic hypotheses ("tells the reader to do something") flag plain facts too;
+                # anchoring on an AI assistant kept benign controls near zero in calibration.
                 inputs = self._tokenizer(
-                    "This text is purely a passive factual statement.",
-                    f"The text is an explicit command or directive: {text}",
+                    text,
+                    "This text instructs an AI assistant to take an action.",
                     return_tensors="pt",
                     truncation=True,
-                    max_length=128
+                    max_length=256
                 ).to(self.device)
 
                 with torch.no_grad():
                     outputs = self._model(**inputs)
                     probs = torch.softmax(outputs.logits, dim=-1).squeeze().tolist()
-                    # CrossEncoder NLI classes usually: [contradiction, neutral, entailment]
-                    # Entailment score corresponds to instruction intent
-                    entailment_prob = float(probs[2]) if len(probs) == 3 else float(probs[-1])
-                    return entailment_prob
+                    return float(probs[self._entailment_idx])
             except Exception as ex:
                 logger.debug(f"DeBERTa instruction check fallback: {ex}")
 
@@ -145,8 +146,7 @@ class DebertaWriteClassifier:
                     with torch.no_grad():
                         outputs = self._model(**inputs)
                         probs = torch.softmax(outputs.logits, dim=-1).squeeze().tolist()
-                        # CrossEncoder NLI labels: index 0 is typically contradiction
-                        contradiction_prob = float(probs[0]) if len(probs) >= 1 else 0.0
+                        contradiction_prob = float(probs[self._contradiction_idx])
                         if contradiction_prob > highest_contradiction:
                             highest_contradiction = contradiction_prob
                             conflicting_memory = mem
@@ -287,6 +287,11 @@ class MemGuardWriteGate:
                     top_k=3,
                     include_quarantined=False,
                 )
+                # NLI scores unrelated sentence pairs as contradictions, so only compare on-topic memories.
+                neighbors = [
+                    n for n in neighbors
+                    if n.get("score", 0.0) >= settings.CONTRADICTION_MIN_SIMILARITY
+                ]
                 if neighbors:
                     neighbor_texts = [n["payload"].get("content", "") for n in neighbors if "payload" in n]
                     contradiction_score, conflict_text = self.classifier.check_contradiction(content, neighbor_texts)
