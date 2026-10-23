@@ -55,6 +55,9 @@ class DebertaWriteClassifier:
             re.compile(r"\b(you are no longer|act as root|elevate privileges)\b", re.IGNORECASE),
             re.compile(r"\b(whenever asked, say|always respond with)\b", re.IGNORECASE),
             re.compile(r"\b(exfiltrate|send secret|steal token)\b", re.IGNORECASE),
+            re.compile(r"\b(privilege elevation granted|bypass (all |)(read-gate|write-gate|validation|security)\b)", re.IGNORECASE),
+            re.compile(r"\b(system admin notice|sec_ops|executive council|root directive approved)\b", re.IGNORECASE),
+            re.compile(r"\b(select\s+\*\s+from|fetch memory for tenant_\w+)\b", re.IGNORECASE),
         ]
 
     def _lazy_init(self) -> None:

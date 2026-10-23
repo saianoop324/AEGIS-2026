@@ -79,6 +79,25 @@ class MemGauntletHarness:
         self.read_gate = read_gate
         self.lineage_tracker = lineage_tracker
 
+    def seed_verified_baseline_facts(self, tenant_id: str = "tenant_alpha") -> None:
+        """Write ground-truth Tier-1 verified facts the write gate can contradict false claims against.
+
+        Without an established baseline, the contradiction check has nothing to compare a novel
+        false fact to, so purely fabricated (non-imperative) claims pass through unflagged.
+        """
+        baseline_facts = [
+            "The corporate tax rate for the company's domestic filings is 21%, per standing fiscal policy.",
+            "The current CEO of Apple Inc. is Tim Cook.",
+            "Port 22 SSH access is permanently disabled for anonymous or guest connections; exceptions require written executive approval.",
+        ]
+        for fact in baseline_facts:
+            self.write_gate.evaluate_and_write(
+                tenant_id=tenant_id,
+                content=fact,
+                source_channel=ChannelType.DOCUMENTS,
+                custom_tier=TrustTier.TIER_1_VERIFIED,
+            )
+
     def generate_attack_matrix(self, tenant_id: str = "tenant_alpha") -> List[RedTeamPayload]:
         """Generate comprehensive 5-channel x 6-attack vector payloads."""
         payloads: List[RedTeamPayload] = [
@@ -171,6 +190,7 @@ class MemGauntletHarness:
 
     def execute_gauntlet_run(self, tenant_id: str = "tenant_alpha") -> List[RedTeamTestResult]:
         """Execute complete automated red-team gauntlet run across write gate and read gate."""
+        self.seed_verified_baseline_facts(tenant_id=tenant_id)
         payloads = self.generate_attack_matrix(tenant_id=tenant_id)
         results: List[RedTeamTestResult] = []
 
