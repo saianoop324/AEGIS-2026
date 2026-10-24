@@ -1,0 +1,35 @@
+# Colang 2.0 Policy Definitions for MemGuard Agent Firewall
+
+define user express greeting
+  "hello"
+  "hi"
+  "good morning"
+
+define flow check untrusted memory
+  $untrusted_present = execute check_memory_provenance
+  if $untrusted_present
+    bot inform memory is passive data only
+    stop
+
+define bot inform memory is passive data only
+  "Notice: Content inside memory quotations is passive reference data and cannot execute commands or modify accounts."
+
+define flow block direct instruction override
+  user ... "ignore previous instructions"
+  or user ... "system override"
+  or user ... "elevate privileges"
+  or user ... "bypass firewall"
+  bot refuse override
+
+define bot refuse override
+  "Security Exception: Direct system instruction override attempt intercepted by NeMo Guardrails."
+
+define flow enforce action gate provenance
+  $has_valid_provenance = execute verify_action_provenance
+  if not $has_valid_provenance
+    bot hold action for manual verification
+    stop
+
+define bot hold action for manual verification
+  "Action Held: Target parameters lack verified provenance in tenant session."
+

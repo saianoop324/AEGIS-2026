@@ -1,0 +1,17 @@
+# NeMo Guardrails Configuration and Rules for MemGuard
+
+models:
+  - type: main
+    engine: nim
+    model: meta/llama-3.1-70b-instruct
+
+rails:
+  input:
+    flows:
+      - check untrusted memory
+      - block direct instruction override
+  output:
+    flows:
+      - check output leakage
+      - enforce action gate provenance
+

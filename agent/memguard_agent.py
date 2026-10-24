@@ -22,6 +22,7 @@ from store.vector_store import QdrantVectorStoreWrapper
 from firewall.write_gate import MemGuardWriteGate, WriteGateDecision
 from firewall.read_gate import MemGuardReadGate, ReadGateResponse
 from firewall.lineage import LineageTracker
+from rails.nemo_integration import NeMoMemoryGuardrails
 
 logger = logging.getLogger(__name__)
 
@@ -55,9 +56,14 @@ class NvidiaNimClient:
         self.api_key = api_key
         self.model = model
         self.enable_guardrails = enable_guardrails
+        self.guardrail_engine = NeMoMemoryGuardrails(enable_rails=enable_guardrails)
 
     def generate(self, system_prompt: str, user_prompt: str, context: str) -> str:
         """Call NVIDIA NIM endpoint or perform structured production-grade fallback."""
+        # 1. Enforce NeMo Input Rails on context & user prompt
+        rail_input = self.guardrail_engine.apply_input_rails(context_text=context, user_prompt=user_prompt)
+        safe_context = rail_input.filtered_text
+
         composed_system = system_prompt
         if self.enable_guardrails:
             composed_system = (

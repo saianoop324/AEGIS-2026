@@ -50,7 +50,7 @@ class Settings(BaseSettings):
     # Embedding & NLI Models
     EMBEDDING_MODEL_NAME: str = "all-MiniLM-L6-v2"
     DEBERTA_NLI_MODEL_NAME: str = "cross-encoder/nli-deberta-v3-small"
-    DEVICE: str = "cpu"
+    DEVICE: str = "cuda"
     WRITE_GATE_CLASSIFIER: str = "deberta"  # "deberta" (local NLI model) or "llm" (OpenAI-compatible endpoint)
     WRITE_GATE_LLM_API_BASE: Optional[str] = None  # defaults to NVIDIA_NIM_API_BASE
     WRITE_GATE_LLM_MODEL: Optional[str] = None     # defaults to NVIDIA_NIM_MODEL
