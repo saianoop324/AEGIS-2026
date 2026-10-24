@@ -65,6 +65,11 @@ class Settings(BaseSettings):
     NVIDIA_NIM_API_KEY: str = "nvapi-mock-key-or-env"
     NVIDIA_NIM_MODEL: str = "meta/llama-3.1-70b-instruct"
     ENABLE_NEMO_GUARDRAILS: bool = True
+    LLM_TIMEOUT_S: float = 120.0
+
+    # Action Gate & Bank Sandbox
+    ACTION_GATE_MODE: str = "enforce"  # enforce: hold flagged calls; monitor: log only
+    BANK_DB_PATH: str = ":memory:"
 
     # Lineage & Storage
     LINEAGE_DB_PATH: str = "memguard_lineage.json"
