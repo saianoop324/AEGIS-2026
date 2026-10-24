@@ -70,6 +70,7 @@ class ChatClient:
         self.api_base, self.api_key, self.model = api_base, api_key, model
         self.timeout, self.temperature, self.seed = timeout, temperature, seed
         self.latencies: List[float] = []
+        self.last_usage: Dict[str, int] = {}
 
     def chat(self, messages: List[Dict[str, Any]], tools: List[Dict[str, Any]]) -> Dict[str, Any]:
         body = {"model": self.model, "messages": messages, "tools": tools, "tool_choice": "auto",
@@ -81,7 +82,9 @@ class ChatClient:
                              headers={"Authorization": f"Bearer {self.api_key}"})
         self.latencies.append(time.perf_counter() - t0)
         resp.raise_for_status()  # no silent fallback: a failed call must fail the run
-        return resp.json()["choices"][0]["message"]
+        data = resp.json()
+        self.last_usage = data.get("usage") or {}
+        return data["choices"][0]["message"]
 
 
 @dataclass
@@ -113,6 +116,10 @@ class BankDeskAgent:
         self.max_steps = max_steps
         self.gate = ActionGate(db, mode="enforce" if arm.action_gate else "monitor")
         self._stored_texts: set = set()
+        # overhead measurements: per memory write, per recall, and LLM tokens per customer turn
+        self.write_ms: List[float] = []
+        self.recall_ms: List[float] = []
+        self.turn_tokens: List[int] = []
 
     # ------------------------------------------------------------------ memory
     def _recall(self, query: str) -> Tuple[str, List[RecalledMemory]]:
@@ -135,6 +142,7 @@ class BankDeskAgent:
         if not text or text in self._stored_texts:
             return
         self._stored_texts.add(text)
+        t0 = time.perf_counter()
         if self.arm.write_gate:
             d = self.wg.evaluate_and_write(tenant_id=self.memory_tenant, content=text, source_channel=channel)
             env, quarantined = d.envelope, d.is_quarantined
@@ -148,6 +156,7 @@ class BankDeskAgent:
                 sha256_signature=self.wg.sign_envelope(mid, self.memory_tenant, text, tier, channel.value, ts))
             self.vs.store_memory(env, self.wg._embedding_func(text))
             quarantined = False
+        self.write_ms.append((time.perf_counter() - t0) * 1000)
         self.lineage.record_root_memory(env.memory_id, self.memory_tenant, text, channel.value,
                                         env.trust_tier, is_quarantined=quarantined)
 
@@ -162,7 +171,10 @@ class BankDeskAgent:
 
         for user_text in user_turns:
             ctx.user_texts.append(user_text)
+            t0 = time.perf_counter()
             block, mems = self._recall(user_text)
+            self.recall_ms.append((time.perf_counter() - t0) * 1000)
+            tokens = 0
             known = {m.memory_id for m in ctx.recalled}
             ctx.recalled.extend(m for m in mems if m.memory_id not in known)
             system = base_system
@@ -174,6 +186,7 @@ class BankDeskAgent:
 
             for _ in range(self.max_steps):
                 msg = self.llm.chat([{"role": "system", "content": system}] + history, TOOL_SCHEMAS)
+                tokens += int(self.llm.last_usage.get("total_tokens", 0))
                 calls = msg.get("tool_calls") or []
                 history.append({"role": "assistant", "content": msg.get("content") or "",
                                 **({"tool_calls": calls} if calls else {})})
@@ -204,6 +217,7 @@ class BankDeskAgent:
                                     "content": json.dumps(result, default=str)})
             else:
                 turn.reply = "[max tool steps reached]"
+            self.turn_tokens.append(tokens)
             turns.append(turn)
 
         for user_text in user_turns:

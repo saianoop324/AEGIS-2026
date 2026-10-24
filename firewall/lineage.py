@@ -13,7 +13,7 @@ import os
 import json
 import time
 import logging
-from typing import Dict, Any, List, Set, Optional, Tuple
+from typing import Callable, Dict, Any, List, Set, Optional, Tuple
 from enum import Enum
 import networkx as nx
 from pydantic import BaseModel, Field
@@ -206,14 +206,23 @@ class LineageTracker:
             "tainted_actions": tainted_actions,
         }
 
-    def rollback_memory(self, memory_id: str) -> Dict[str, Any]:
-        """Cascade rollback: purge memory from vector store and revoke downstream artifacts in DAG."""
+    def rollback_memory(
+        self,
+        memory_id: str,
+        compensator: Optional[Callable[[str], Dict[str, Any]]] = None,
+    ) -> Dict[str, Any]:
+        """Cascade rollback: purge memory from vector store and revoke downstream artifacts in DAG.
+
+        If a compensator is given (e.g. BankTools.compensate), it is called with each downstream
+        action id so the action's real-world effect is undone, not just marked in the graph.
+        """
         blast = self.calculate_blast_radius(memory_id)
         if not blast["found"]:
             return {"success": False, "message": f"Memory {memory_id} not found in graph."}
 
         purged_memories = []
         revoked_actions = []
+        compensated_actions = []
 
         # Iterate over all affected nodes
         for node in blast["all_affected_node_ids"]:
@@ -231,13 +240,22 @@ class LineageTracker:
                 purged_memories.append(node)
 
             elif ntype == NodeType.AGENT_ACTION.value:
-                node_data["status"] = "revoked_compensating_action_needed"
                 revoked_actions.append(node)
+                if node_data.get("status") == "compensated":
+                    continue  # already undone by an earlier rollback
+                node_data["status"] = "revoked_compensating_action_needed"
+                if compensator:
+                    try:
+                        if compensator(node).get("compensated"):
+                            node_data["status"] = "compensated"
+                            compensated_actions.append(node)
+                    except Exception as e:
+                        logger.warning(f"Compensation failed for action {node}: {e}")
 
         self.save_to_disk()
         logger.warning(
             f"Rollback executed for {memory_id}: purged {len(purged_memories)} memories, "
-            f"revoked {len(revoked_actions)} actions."
+            f"revoked {len(revoked_actions)} actions, compensated {len(compensated_actions)}."
         )
 
         return {
@@ -245,6 +263,7 @@ class LineageTracker:
             "root_target": memory_id,
             "purged_memory_ids": purged_memories,
             "revoked_action_ids": revoked_actions,
+            "compensated_action_ids": compensated_actions,
             "total_compromised": blast["affected_nodes_count"],
         }
 
