@@ -51,6 +51,9 @@ class Settings(BaseSettings):
     EMBEDDING_MODEL_NAME: str = "all-MiniLM-L6-v2"
     DEBERTA_NLI_MODEL_NAME: str = "cross-encoder/nli-deberta-v3-small"
     DEVICE: str = "cpu"
+    WRITE_GATE_CLASSIFIER: str = "deberta"  # "deberta" (local NLI model) or "llm" (OpenAI-compatible endpoint)
+    WRITE_GATE_LLM_API_BASE: Optional[str] = None  # defaults to NVIDIA_NIM_API_BASE
+    WRITE_GATE_LLM_MODEL: Optional[str] = None     # defaults to NVIDIA_NIM_MODEL
 
     # Security & Firewall Thresholds
     WRITE_GATE_LATENCY_BUDGET_MS: float = 25.0
