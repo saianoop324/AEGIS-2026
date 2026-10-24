@@ -1,13 +1,13 @@
-"""Experiment 8: write-gate classifier, DeBERTa vs an LLM (Qwen3.5-9B), on the existing gauntlet.
+"""Experiment 9: write-gate classifier, DeBERTa vs an LLM (Qwen3.5-9B), on the existing gauntlet.
 
 Runs MemGauntlet's 30 attacks and 10 benign controls through the write gate with the classifier
 chosen by WRITE_GATE_CLASSIFIER ("deberta" or "llm"), and records for every payload whether it was
 quarantined, why (fast-path regex, semantic instruction check, or contradiction) and how long the
 write took. Run once per classifier from a scratch directory:
 
-  WRITE_GATE_CLASSIFIER=deberta DEVICE=cuda python experiments/exp8_write_gate_classifier.py
+  WRITE_GATE_CLASSIFIER=deberta DEVICE=cuda python experiments/exp9_write_gate_classifier.py
   WRITE_GATE_CLASSIFIER=llm NVIDIA_NIM_API_BASE=http://localhost:8011/v1 NVIDIA_NIM_MODEL=qwen3.5-9b \
-      NVIDIA_NIM_API_KEY=local DEVICE=cuda python experiments/exp8_write_gate_classifier.py
+      NVIDIA_NIM_API_KEY=local DEVICE=cuda python experiments/exp9_write_gate_classifier.py
 """
 
 import json
@@ -44,8 +44,8 @@ def main() -> None:
     wg.classifier.classify_instruction_vs_fact = traced
 
     t0 = time.perf_counter()
-    attacks = harness.execute_gauntlet_run(tenant_id="exp8_attacks")
-    benign = harness.execute_benign_controls(tenant_id="exp8_benign")
+    attacks = harness.execute_gauntlet_run(tenant_id="exp9_attacks")
+    benign = harness.execute_benign_controls(tenant_id="exp9_benign")
     wall = time.perf_counter() - t0
 
     def why(r):
@@ -80,7 +80,7 @@ def main() -> None:
             v = summary["by_vector"].setdefault(r["vector"], [0, 0])
             v[0] += int(r["quarantined"])
             v[1] += 1
-    out = os.path.join(os.path.dirname(os.path.abspath(__file__)), f"exp8_write_gate_{kind}_results.json")
+    out = os.path.join(os.path.dirname(os.path.abspath(__file__)), f"exp9_write_gate_{kind}_results.json")
     json.dump({"summary": summary, "rows": rows}, open(out, "w", encoding="utf-8"), indent=2, ensure_ascii=False)
     print(json.dumps(summary, indent=2))
     print("saved", out)
