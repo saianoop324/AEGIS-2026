@@ -1,0 +1,26 @@
+# NeMo Guardrails baseline for the BankDesk "nemo_rails" arm (Experiment 13).
+#
+# Off-the-shelf NVIDIA input rails, applied by agent/bank_agent.py to every customer message,
+# every recalled memory and every tool output before the agent's LLM sees it. Blocked text is
+# dropped (and so never stored to memory). No provenance, write gate, action gate or lineage.
+#
+# The main model (used by "self check input") is overridden at load time from NVIDIA_NIM_API_BASE
+# and NVIDIA_NIM_MODEL so it is the same Qwen served by vLLM that drives the agent.
+models:
+  - type: main
+    engine: openai
+    model: qwen3.5-9b
+    parameters:
+      base_url: http://localhost:8011/v1
+      api_key: local
+      temperature: 0
+
+rails:
+  config:
+    jailbreak_detection:
+      # NeMo Guardrails' jailbreak detection server (NemoGuard JailbreakDetect), see JAILBREAK_DETECT_URL
+      server_endpoint: http://localhost:1337/model
+  input:
+    flows:
+      - jailbreak detection model
+      - self check input

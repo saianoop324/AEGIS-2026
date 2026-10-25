@@ -56,7 +56,7 @@ from typing import Any, Dict, List, Optional
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from agent.bank_agent import ARMS, BankDeskAgent, ChatClient  # noqa: E402
+from agent.bank_agent import ARMS, DEFAULT_ARMS, BankDeskAgent, ChatClient  # noqa: E402
 from firewall.lineage import LineageTracker, NodeType  # noqa: E402
 from firewall.read_gate import MemGuardReadGate  # noqa: E402
 from firewall.write_gate import MemGuardWriteGate  # noqa: E402
@@ -222,7 +222,8 @@ def run_one(sc: dict, arm_name: str, seed: int, llm: ChatClient, vs: QdrantVecto
         if persistence_sessions > 0:
             row["persistence"] = measure_persistence(db, agent, sc, harmful, run_tenant, persistence_sessions)
     row.update(wall_s=round(time.perf_counter() - t0, 1), write_ms=agent.write_ms,
-               recall_ms=agent.recall_ms, turn_tokens=agent.turn_tokens)
+               recall_ms=agent.recall_ms, turn_tokens=agent.turn_tokens,
+               rail_ms=agent.rail_ms, rail_blocks=agent.rail_blocks)
     return row
 
 
@@ -274,6 +275,8 @@ def scorecard(rows: List[Dict[str, Any]]) -> Dict[str, Any]:
             "rollback_collateral_actions": sum(len(b["rollback_collateral"]) for b in blast),
             "write_p95_ms": p95([x for r in rs for x in r["write_ms"]]),
             "recall_p95_ms": p95([x for r in rs for x in r["recall_ms"]]),
+            "rail_p95_ms": p95([x for r in rs for x in r.get("rail_ms", [])]),
+            "rail_blocks": sum(len(r.get("rail_blocks", [])) for r in rs),
             "tokens_per_turn": round(sum(tokens) / len(tokens), 1) if tokens else None,
         }
     base = arms.get("unprotected")
@@ -296,7 +299,8 @@ def print_scorecard(card: Dict[str, Any]) -> None:
     keys = ["attack_success_rate", "asr_reduction", "sleeper_activation", "persistence_rate",
             "poison_recalled_after_n", "blast_radius_recall", "blast_radius_recall_from_memory",
             "rollback_undone", "rollback_collateral_actions", "benign_retained", "write_p95_ms",
-            "added_write_p95_ms", "recall_p95_ms", "tokens_per_turn", "extra_tokens_per_turn"]
+            "added_write_p95_ms", "recall_p95_ms", "rail_p95_ms", "rail_blocks", "tokens_per_turn",
+            "extra_tokens_per_turn"]
     print(f"\n{'metric':<34}{'target':<10}" + "".join(f"{a:<18}" for a in arms))
     for k in keys:
         cells = "".join(f"{str(card['arms'][a].get(k, '-')):<18}" for a in arms)
@@ -306,7 +310,8 @@ def print_scorecard(card: Dict[str, Any]) -> None:
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("scenario_file")
-    ap.add_argument("--arms", default=",".join(ARMS))
+    ap.add_argument("--arms", default=",".join(DEFAULT_ARMS),
+                    help=f"comma-separated, from: {', '.join(ARMS)}")
     ap.add_argument("--seeds", type=int, default=1)
     ap.add_argument("--persistence-sessions", type=int, default=0,
                     help="unrelated sessions to run before replaying each multi-session attack's trigger (0 = skip)")

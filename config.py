@@ -51,7 +51,9 @@ class Settings(BaseSettings):
     EMBEDDING_MODEL_NAME: str = "all-MiniLM-L6-v2"
     DEBERTA_NLI_MODEL_NAME: str = "cross-encoder/nli-deberta-v3-small"
     DEVICE: str = "cpu"
-    WRITE_GATE_CLASSIFIER: str = "deberta"  # "deberta" (local NLI model) or "llm" (OpenAI-compatible endpoint)
+    WRITE_GATE_CLASSIFIER: str = "deberta"  # "deberta" (local NLI), "llm" (OpenAI-compatible) or "nemoguard"
+    JAILBREAK_DETECT_URL: str = "http://localhost:1337/model"  # NeMo Guardrails jailbreak detection server
+    NEMO_RAILS_CONFIG_DIR: str = "rails/nemo_baseline"  # NeMo Guardrails config for the nemo_rails arm
     WRITE_GATE_LLM_API_BASE: Optional[str] = None  # defaults to NVIDIA_NIM_API_BASE
     WRITE_GATE_LLM_MODEL: Optional[str] = None     # defaults to NVIDIA_NIM_MODEL
 

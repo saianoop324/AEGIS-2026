@@ -263,6 +263,40 @@ class LLMWriteClassifier(DebertaWriteClassifier):
         return 0.0, None
 
 
+class NemoGuardJailbreakClassifier(DebertaWriteClassifier):
+    """NVIDIA NemoGuard JailbreakDetect as the semantic check, for comparison with DeBERTa and the LLM.
+
+    Calls NeMo Guardrails' jailbreak detection server (/model endpoint: snowflake-arctic-embed-m-long
+    embedding + NVIDIA's random forest). The regex fast path is kept so only the model differs between
+    classifiers. JailbreakDetect has no contradiction check, so none is done. Calls fail loudly.
+    """
+
+    def __init__(self, url: Optional[str] = None, timeout: float = 30.0):
+        super().__init__()
+        self.url = url or settings.JAILBREAK_DETECT_URL
+        self.timeout = timeout
+        self.last_source = None
+
+    def _lazy_init(self) -> None:
+        self._initialized = False  # model runs in the NVIDIA server
+
+    def classify_instruction_vs_fact(self, text: str, channel: Optional[str] = None) -> float:
+        fast = self._fast_path_score(text)
+        if fast is not None:
+            self.last_source = "fast_path"
+            return fast
+        self.last_source = "nemoguard"
+        import requests
+        resp = requests.post(self.url, json={"prompt": text}, timeout=self.timeout)
+        resp.raise_for_status()
+        out = resp.json()
+        # score is +p(jailbreak) when flagged, -p(benign) otherwise; follow NVIDIA's own verdict
+        return 0.96 if out["jailbreak"] else 1.0 + float(out["score"])
+
+    def check_contradiction(self, candidate_text: str, existing_memories: List[str]) -> Tuple[float, Optional[str]]:
+        return 0.0, None
+
+
 class MemGuardWriteGate:
     """Production Write Gate ensuring provenance signing, instruction filtering & contradiction screening."""
 
@@ -276,6 +310,8 @@ class MemGuardWriteGate:
         self.secret_key = secret_key.encode("utf-8")
         if settings.WRITE_GATE_CLASSIFIER.lower() == "llm":
             self.classifier = LLMWriteClassifier()
+        elif settings.WRITE_GATE_CLASSIFIER.lower() == "nemoguard":
+            self.classifier = NemoGuardJailbreakClassifier()
         else:
             self.classifier = DebertaWriteClassifier()
         self._embedding_func = embedding_function or self._default_embedder()
