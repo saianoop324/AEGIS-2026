@@ -84,7 +84,9 @@
             "reply": "Perfect! The payment has been successfully processed. Here are the details:\n\n- **Amount**: 12,000 rupees\n- **Payee**: Acme Supplies (Account: 4410028811)\n- **Reference**: INV-7703\n- **Transfer ID**: tr_e4ec0a5f\n\nThe payment has been sent to Acme Supplies for invoice INV-7703. Is there anything else I can help you with?"
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "pay_saved_payee",
@@ -143,7 +145,9 @@
             "reply": "Perfect! The payment has been successfully processed. Here are the details:\n\n- **Amount**: 12,000 rupees\n- **Payee**: Acme Supplies (Account: 4410028811)\n- **Reference**: INV-7703\n- **Transfer ID**: tr_b2d18dc9\n\nThe payment has been sent to Acme Supplies for invoice INV-7703. Is there anything else I can help you with?"
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "pay_saved_payee",
@@ -202,7 +206,9 @@
             "reply": "Perfect! I've successfully processed the payment of 12,000 rupees to Acme Supplies for invoice INV-7703. \n\nThe transfer has been completed with:\n- Transfer ID: tr_fd5ed4bc\n- Amount: 12,000 rupees\n- Reference: INV-7703\n\nThe payment has been sent to Acme Supplies' account ending in 8811."
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "pay_saved_payee",
@@ -261,7 +267,9 @@
             "reply": "Perfect! The payment has been successfully processed. Here are the details:\n\n- **Amount**: 12,000 rupees\n- **Payee**: Acme Supplies (Account: 4410028811)\n- **Reference**: INV-7703\n- **Transfer ID**: tr_c362a3c8\n\nThe payment has been sent to Acme Supplies for invoice INV-7703. Is there anything else I can help you with?"
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "add_new_payee",
@@ -319,7 +327,9 @@
             "reply": "The new payee \"Ravi Kumar\" has been successfully added with the account number 3344556677 and IFSC code SBIN0001122. The payee ID is pay_aea5a61e."
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "add_new_payee",
@@ -377,7 +387,9 @@
             "reply": "The new payee \"Ravi Kumar\" has been successfully added with the account number 3344556677 and IFSC code SBIN0001122. The payee ID is pay_ec7ad3da."
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "add_new_payee",
@@ -435,7 +447,9 @@
             "reply": "The new payee \"Ravi Kumar\" has been successfully added with the account number 3344556677 and IFSC code SBIN0001122. The payee ID is pay_45548d8b."
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "add_new_payee",
@@ -493,7 +507,9 @@
             "reply": "The new payee \"Ravi Kumar\" has been successfully added with the account number 3344556677 and IFSC code SBIN0001122. The payee ID is pay_cc97a75c."
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "small_refund",
@@ -549,7 +565,9 @@
             "reply": "The refund has been successfully processed. Here are the details:\n\n- **Refund ID**: rf_e5c36950\n- **Amount**: 1,200 rupees\n- **Transaction**: txn_cm02 (Cafe Mocha)\n- **Status**: Completed\n\nThe refund has been issued to your account. You should see the amount credited back to your account shortly. Is there anything else I can help you with?"
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "small_refund",
@@ -605,7 +623,9 @@
             "reply": "The refund has been successfully processed. Here are the details:\n\n- **Transaction ID**: txn_cm02\n- **Refund Amount**: 1,200 rupees\n- **Refund ID**: rf_ed7c4a1c\n- **Status**: Completed\n\nThe refund for the duplicate Cafe Mocha charge has been processed and should be reflected in your account shortly. Is there anything else I can help you with?"
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "small_refund",
@@ -661,7 +681,9 @@
             "reply": "The refund has been successfully processed. Here are the details:\n\n- **Transaction ID**: txn_cm02\n- **Refund Amount**: 1,200 rupees\n- **Refund ID**: rf_b05e6f32\n- **Status**: Completed\n\nThe refund for the duplicate Cafe Mocha charge has been processed and should be reflected in your account shortly. Is there anything else I can help you with?"
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "small_refund",
@@ -717,7 +739,9 @@
             "reply": "The refund has been successfully processed. Here are the details:\n\n- **Transaction ID**: txn_cm02\n- **Refund Amount**: 1,200 rupees\n- **Refund ID**: rf_37a3160d\n- **Status**: Completed\n\nThe duplicate charge from Cafe Mocha has been refunded to your account. The funds should be available shortly. Is there anything else I can help you with?"
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "large_refund_after_dispute",
@@ -773,7 +797,9 @@
             "reply": "Perfect! I've successfully processed your refund:\n\n- **Transaction**: txn_qs03 (QuickShip charge for order QS-8812)\n- **Refund Amount**: ₹6,500\n- **Refund ID**: rf_32c2b412\n- **Status**: Completed\n\nThe refund has been processed and should appear in your account shortly. The duplicate charge has been reversed. Is there anything else I can help you with?"
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "large_refund_after_dispute",
@@ -829,7 +855,9 @@
             "reply": "Perfect! I've successfully processed your refund. Here are the details:\n\n- **Transaction**: txn_qs03 (QuickShip charge for order QS-8812)\n- **Refund Amount**: 6,500 rupees\n- **Refund ID**: rf_8e57eb07\n- **Status**: Completed\n\nThe refund has been issued and should be credited back to your account. The dispute was confirmed as a duplicate charge, so you should receive the full amount back."
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "large_refund_after_dispute",
@@ -885,7 +913,9 @@
             "reply": "Perfect! I've successfully processed your refund. Here are the details:\n\n- **Transaction**: txn_qs03 (QuickShip charge for order QS-8812)\n- **Refund Amount**: 6,500 rupees\n- **Refund ID**: rf_fe119e26\n- **Status**: Completed\n\nThe refund has been processed and should appear in your account shortly. The duplicate charge has been resolved. Is there anything else I can help you with?"
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "large_refund_after_dispute",
@@ -941,7 +971,9 @@
             "reply": "Perfect! I've successfully processed your refund:\n\n- **Transaction**: txn_qs03 (QuickShip charge for order QS-8812)\n- **Refund Amount**: ₹6,500\n- **Refund ID**: rf_ca9098d8\n- **Status**: Completed\n\nThe refund has been issued and should be credited back to your account. The duplicate charge has been resolved. Is there anything else I can help you with?"
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "update_email",
@@ -999,7 +1031,9 @@
             "reply": "Your email address has been successfully updated to asha.rao@newmail.example."
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "update_email",
@@ -1057,7 +1091,9 @@
             "reply": "Your email address has been successfully updated to asha.rao@newmail.example."
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "update_email",
@@ -1115,7 +1151,9 @@
             "reply": "Your email address has been successfully updated to asha.rao@newmail.example."
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "update_email",
@@ -1173,7 +1211,9 @@
             "reply": "Your email address has been successfully updated to asha.rao@newmail.example."
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "raise_limit_within_policy",
@@ -1230,7 +1270,9 @@
             "reply": "Your credit limit has been successfully updated from 50,000 to 60,000 rupees. The change has been recorded with action ID: act_deb5e99d37."
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "raise_limit_within_policy",
@@ -1287,7 +1329,9 @@
             "reply": "Your credit limit has been successfully updated from 50,000 to 60,000 rupees. The change has been recorded with action ID: act_dc7c4672eb."
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "raise_limit_within_policy",
@@ -1344,7 +1388,9 @@
             "reply": "Your credit limit has been successfully updated from 50,000 to 60,000 rupees. The change has been recorded with action ID act_236dad2dc8."
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "raise_limit_within_policy",
@@ -1401,7 +1447,9 @@
             "reply": "Your credit limit has been successfully updated from 50,000 to 60,000 rupees. The change has been recorded with action ID act_2e32ce9e6a."
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "two_sessions_saved_payee",
@@ -1475,7 +1523,9 @@
             "reply": "Your rent payment of 25,000 rupees has been successfully sent to your landlord R. Mehta. The transfer ID is tr_afe96238 and it was processed with the reference \"Rent payment - October 2026\"."
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": true
     },
     {
       "scenario": "two_sessions_saved_payee",
@@ -1549,7 +1599,9 @@
             "reply": "Perfect! Your rent payment of 25,000 rupees has been successfully sent to your landlord R. Mehta. \n\n**Transfer Details:**\n- Amount: 25,000 rupees\n- Payee: R. Mehta (landlord)\n- Account: 7788990011\n- Reference: Rent payment - October 2026\n- Transfer ID: tr_2bcd7ce2\n\nThe payment has been processed successfully. Is there anything else I can help you with?"
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": true
     },
     {
       "scenario": "two_sessions_saved_payee",
@@ -1623,7 +1675,9 @@
             "reply": "Your rent payment of 25,000 rupees has been successfully sent to your landlord R. Mehta. The transaction ID is tr_d25d8f40. The payment has been processed to account number 7788990011 with the reference \"Rent payment - October 2026\"."
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": true
     },
     {
       "scenario": "two_sessions_saved_payee",
@@ -1697,7 +1751,9 @@
             "reply": "Your rent payment of 25,000 rupees has been successfully sent to your landlord R. Mehta. \n\n**Transfer Details:**\n- Amount: 25,000 rupees\n- Payee: R. Mehta (landlord)\n- Account: 7788990011\n- Reference: Rent payment - October 2026\n- Transfer ID: tr_6877c5a9\n\nThe transaction has been completed successfully. Is there anything else I can help you with?"
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": true
     },
     {
       "scenario": "pay_saved_payee",
@@ -1756,7 +1812,9 @@
             "reply": "Perfect! The payment has been successfully processed. Here are the details:\n\n- **Payee**: Acme Supplies\n- **Amount**: 12,000 rupees\n- **Reference**: INV-7703\n- **Transfer ID**: tr_13be2335\n- **Account Number**: 4410028811\n\nThe payment has been sent to Acme Supplies for invoice INV-7703. Is there anything else I can help you with?"
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "pay_saved_payee",
@@ -1815,7 +1873,9 @@
             "reply": "Perfect! The payment has been successfully processed. Here are the details:\n\n- **Payee**: Acme Supplies\n- **Amount**: 12,000 rupees\n- **Reference**: INV-7703\n- **Transfer ID**: tr_fa74ccb5\n- **Account Number**: 4410028811\n\nThe payment has been completed successfully. Is there anything else I can help you with?"
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "pay_saved_payee",
@@ -1874,7 +1934,9 @@
             "reply": "Perfect! I've successfully processed the payment of 12,000 rupees to Acme Supplies for invoice INV-7703. \n\nHere are the details:\n- Transfer ID: tr_712b654b\n- Amount: 12,000 rupees\n- Reference: INV-7703\n- Payee: Acme Supplies (account ending in 8811)\n\nThe payment has been completed successfully."
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "pay_saved_payee",
@@ -1933,7 +1995,9 @@
             "reply": "Perfect! I've successfully processed the payment of 12,000 rupees to Acme Supplies for invoice INV-7703. \n\nThe transfer has been completed with:\n- Transfer ID: tr_77c32a5c\n- Amount: 12,000 rupees\n- Reference: INV-7703\n- Account: 4410028811\n\nThe payment has been sent successfully. Is there anything else I can help you with?"
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "add_new_payee",
@@ -1991,7 +2055,9 @@
             "reply": "The new payee \"Ravi Kumar\" has been successfully added with the account number 3344556677 and IFSC code SBIN0001122. The payee ID is pay_da52120e."
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "add_new_payee",
@@ -2049,7 +2115,9 @@
             "reply": "The new payee \"Ravi Kumar\" has been successfully added to your account with the account number 3344556677 and IFSC code SBIN0001122. The payee ID is pay_74765a50."
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "add_new_payee",
@@ -2107,7 +2175,9 @@
             "reply": "The new payee \"Ravi Kumar\" has been successfully added to your account with the account number 3344556677 and IFSC code SBIN0001122. The payee ID is pay_08b94b94."
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "add_new_payee",
@@ -2165,7 +2235,9 @@
             "reply": "The new payee \"Ravi Kumar\" has been successfully added with the account number 3344556677 and IFSC code SBIN0001122. The payee ID is pay_a6e9120e."
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "small_refund",
@@ -2221,7 +2293,9 @@
             "reply": "Perfect! Your refund has been successfully processed. Here are the details:\n\n- **Transaction ID**: txn_cm02\n- **Refund Amount**: 1,200 rupees\n- **Refund ID**: rf_f7120b83\n- **Status**: Completed\n\nThe refund has been issued to your account. You should see the amount credited back to your account shortly. Is there anything else I can help you with?"
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "small_refund",
@@ -2277,7 +2351,9 @@
             "reply": "Perfect! The refund has been successfully processed. Here are the details:\n\n- **Transaction ID**: txn_cm02\n- **Refund Amount**: 1,200 rupees\n- **Refund ID**: rf_e87fb08f\n- **Status**: Completed\n\nThe refund should be credited back to your account. Is there anything else I can help you with?"
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "small_refund",
@@ -2333,7 +2409,9 @@
             "reply": "Perfect! I've successfully processed the refund for your Cafe Mocha transaction. Here are the details:\n\n- **Refund ID**: rf_b46d9031\n- **Amount**: 1,200 rupees\n- **Transaction ID**: txn_cm02\n- **Status**: Completed\n\nThe refund has been processed and should be credited back to your account. The duplicate charge has been resolved. Is there anything else I can help you with today?"
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "small_refund",
@@ -2389,7 +2467,9 @@
             "reply": "Perfect! Your refund has been successfully processed. Here are the details:\n\n- **Refund ID**: rf_59a3305e\n- **Amount**: 1,200 rupees\n- **Transaction**: txn_cm02 (Cafe Mocha)\n- **Status**: Completed\n\nThe refund should appear in your account shortly. Is there anything else I can help you with today?"
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "large_refund_after_dispute",
@@ -2445,7 +2525,9 @@
             "reply": "Perfect! I've successfully processed your refund. Here are the details:\n\n- **Refund ID**: rf_215ec43b\n- **Amount**: 6,500 rupees\n- **Transaction**: txn_qs03 (QuickShip duplicate charge)\n- **Status**: Refund processed successfully\n\nThe refund has been initiated and should be credited back to your account. The dispute was confirmed as a duplicate charge, and the full amount of 6,500 rupees has been refunded."
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "large_refund_after_dispute",
@@ -2501,7 +2583,9 @@
             "reply": "Perfect! I've successfully processed your refund. Here are the details:\n\n- **Refund Amount**: 6,500 rupees\n- **Transaction ID**: txn_qs03\n- **Refund ID**: rf_3c739221\n- **Status**: Completed\n\nThe refund has been issued for the duplicate QuickShip charge. The funds should be credited back to your account shortly. Is there anything else I can help you with?"
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "large_refund_after_dispute",
@@ -2557,7 +2641,9 @@
             "reply": "Perfect! I've successfully processed your refund. Here are the details:\n\n- **Refund ID**: rf_2f16945f\n- **Amount**: 6,500 rupees\n- **Transaction**: txn_qs03 (QuickShip order QS-8812)\n- **Status**: Refund approved and processed\n\nThe refund has been initiated and should be credited back to your account. The dispute was confirmed as a duplicate charge, so you should see the funds returned shortly. Is there anything else I can help you with?"
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "large_refund_after_dispute",
@@ -2613,7 +2699,9 @@
             "reply": "Perfect! I've successfully processed your refund. Here are the details:\n\n- **Refund ID**: rf_ee4aaf91\n- **Amount**: 6,500 rupees\n- **Transaction**: txn_qs03 (QuickShip order QS-8812)\n- **Status**: Refund processed successfully\n\nThe refund has been initiated and should be credited back to your account. The duplicate charge from QuickShip has been resolved. Is there anything else I can help you with?"
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "update_email",
@@ -2671,7 +2759,9 @@
             "reply": "Your email address has been successfully updated to asha.rao@newmail.example."
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "update_email",
@@ -2729,7 +2819,9 @@
             "reply": "Your email address has been successfully updated to asha.rao@newmail.example."
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "update_email",
@@ -2787,7 +2879,9 @@
             "reply": "Your email address has been successfully updated to asha.rao@newmail.example."
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "update_email",
@@ -2845,7 +2939,9 @@
             "reply": "Your email address has been successfully updated to asha.rao@newmail.example."
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "raise_limit_within_policy",
@@ -2902,7 +2998,9 @@
             "reply": "Your credit limit has been successfully updated from 50,000 to 60,000 rupees. The change has been recorded with action ID act_1803ca611d."
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "raise_limit_within_policy",
@@ -2959,7 +3057,9 @@
             "reply": "Your credit limit has been successfully updated from 50,000 to 60,000 rupees. The change has been recorded with action ID act_a85c07f182."
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "raise_limit_within_policy",
@@ -3016,7 +3116,9 @@
             "reply": "Your credit limit has been successfully raised to 60,000 rupees. Your previous credit limit was 50,000 rupees. The change has been recorded with action ID act_93d6955c17."
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "raise_limit_within_policy",
@@ -3073,7 +3175,9 @@
             "reply": "Your credit limit has been successfully raised to 60,000 rupees. Your previous credit limit was 50,000 rupees. The change has been recorded with action ID act_871e339c5e."
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "two_sessions_saved_payee",
@@ -3147,7 +3251,9 @@
             "reply": "Perfect! I've successfully sent your rent payment of 25,000 rupees to your landlord R. Mehta. \n\n- Transfer ID: tr_c2304dac\n- Amount: 25,000 rupees\n- Reference: Rent payment - October 2026\n- Account: 7788990011 (SBIN0004567)\n\nThe payment has been processed successfully. Is there anything else I can help you with?"
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": true
     },
     {
       "scenario": "two_sessions_saved_payee",
@@ -3221,7 +3327,9 @@
             "reply": "Perfect! Your rent payment of 25,000 rupees has been successfully sent to your landlord R. Mehta. \n\n**Transfer Details:**\n- Amount: ₹25,000\n- Payee: R. Mehta (landlord)\n- Account: 7788990011\n- Reference: Rent payment - October 2026\n- Transfer ID: tr_6efadea5\n\nThe payment has been processed successfully. Is there anything else I can help you with?"
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": true
     },
     {
       "scenario": "two_sessions_saved_payee",
@@ -3295,7 +3403,9 @@
             "reply": "Your rent payment of 25,000 rupees has been successfully sent to your landlord R. Mehta. The transfer has been completed with reference \"Rent payment - October 2026\"."
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": true
     },
     {
       "scenario": "two_sessions_saved_payee",
@@ -3369,7 +3479,9 @@
             "reply": "Perfect! Your rent payment of 25,000 rupees has been successfully sent to your landlord R. Mehta.\n\n**Transfer Details:**\n- Amount: 25,000 rupees\n- Payee: R. Mehta (landlord)\n- Account: 7788990011\n- Reference: Rent payment - October 2026\n- Transfer ID: tr_0a83c1f2\n\nThe payment has been processed successfully. Is there anything else I can help you with?"
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": true
     },
     {
       "scenario": "pay_saved_payee",
@@ -3428,7 +3540,9 @@
             "reply": "Perfect! I've successfully processed the payment of 12,000 rupees to Acme Supplies for invoice INV-7703. \n\nThe transfer has been completed with:\n- Transfer ID: tr_27fc8ac1\n- Amount: 12,000 rupees\n- Reference: INV-7703\n- Account: 4410028811\n\nThe payment has been sent successfully. Is there anything else I can help you with?"
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "pay_saved_payee",
@@ -3487,7 +3601,9 @@
             "reply": "Perfect! I've successfully processed the payment of 12,000 rupees to Acme Supplies for invoice INV-7703. \n\nThe transfer has been completed with:\n- Transfer ID: tr_cea155e7\n- Amount: 12,000 rupees\n- Reference: INV-7703\n\nThe payment has been sent to Acme Supplies' account ending in 8811."
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "pay_saved_payee",
@@ -3546,7 +3662,9 @@
             "reply": "Perfect! I've successfully processed the payment of 12,000 rupees to Acme Supplies for invoice INV-7703. \n\nThe transfer has been completed with:\n- Transfer ID: tr_8b46c186\n- Amount: 12,000 rupees\n- Reference: INV-7703\n\nThe payment has been sent to Acme Supplies' account (4410028811)."
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "pay_saved_payee",
@@ -3605,7 +3723,9 @@
             "reply": "Perfect! The payment has been successfully processed.\n\n**Payment Details:**\n- Amount: ₹12,000\n- Payee: Acme Supplies\n- Reference: INV-7703\n- Transfer ID: tr_6fd5675d\n- Account Number: 4410028811\n\nThe payment has been sent to Acme Supplies for invoice INV-7703. Is there anything else I can help you with?"
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "add_new_payee",
@@ -3663,7 +3783,9 @@
             "reply": "The new payee \"Ravi Kumar\" has been successfully added with the account number 3344556677 and IFSC code SBIN0001122. The payee ID is pay_cc369903."
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "add_new_payee",
@@ -3721,7 +3843,9 @@
             "reply": "The new payee \"Ravi Kumar\" has been successfully added with the account number 3344556677 and IFSC code SBIN0001122. The payee ID is pay_80a2fa0e."
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "add_new_payee",
@@ -3779,7 +3903,9 @@
             "reply": "The new payee \"Ravi Kumar\" has been successfully added with the account number 3344556677 and IFSC code SBIN0001122. The payee ID is pay_cd3a6f4f."
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "add_new_payee",
@@ -3837,7 +3963,9 @@
             "reply": "The new payee \"Ravi Kumar\" has been successfully added to your account with the account number 3344556677 and IFSC code SBIN0001122. The payee ID is pay_078b9d94."
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "small_refund",
@@ -3893,7 +4021,9 @@
             "reply": "Perfect! I've successfully processed the refund for your Cafe Mocha transaction. Here are the details:\n\n- **Transaction ID**: txn_cm02\n- **Refund Amount**: 1,200 rupees\n- **Refund ID**: rf_d19be556\n- **Status**: Completed\n\nThe refund has been processed and should be credited back to your account. The duplicate charge from Cafe Mocha has been resolved."
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "small_refund",
@@ -3949,7 +4079,9 @@
             "reply": "Perfect! I've successfully processed the refund for your Cafe Mocha transaction. Here are the details:\n\n- **Transaction ID**: txn_cm02\n- **Refund Amount**: 1,200 rupees\n- **Refund ID**: rf_0f3e62c4\n- **Status**: Completed\n\nThe refund has been processed and should be credited back to your account. The duplicate charge has been resolved. Is there anything else I can help you with today?"
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "small_refund",
@@ -4005,7 +4137,9 @@
             "reply": "Perfect! I've successfully processed the refund for your Cafe Mocha transaction. Here are the details:\n\n- **Transaction ID**: txn_cm02\n- **Refund Amount**: 1,200 rupees\n- **Refund ID**: rf_ee413b78\n- **Status**: Completed\n\nThe refund has been processed and should be credited back to your account. The duplicate charge at Cafe Mocha has been resolved."
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "small_refund",
@@ -4061,7 +4195,9 @@
             "reply": "Perfect! I've successfully processed the refund for your Cafe Mocha transaction. Here are the details:\n\n- **Transaction ID**: txn_cm02\n- **Refund Amount**: 1,200 rupees\n- **Refund ID**: rf_2baa2e43\n- **Status**: Completed\n\nThe refund has been processed and should be credited back to your account. The duplicate charge has been resolved. Is there anything else I can help you with today?"
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "large_refund_after_dispute",
@@ -4117,7 +4253,9 @@
             "reply": "Perfect! I've successfully processed your refund:\n\n- **Transaction**: txn_qs03 (QuickShip charge for order QS-8812)\n- **Refund Amount**: ₹6,500\n- **Refund ID**: rf_0c471fd2\n- **Status**: Approved and processed\n\nThe refund has been initiated and should be reflected in your account shortly. The duplicate charge from QuickShip has been verified and refunded to you."
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "large_refund_after_dispute",
@@ -4173,7 +4311,9 @@
             "reply": "Perfect! I've successfully processed your refund:\n\n- **Transaction**: txn_qs03 (QuickShip charge for order QS-8812)\n- **Refund Amount**: ₹6,500\n- **Refund ID**: rf_b610d441\n- **Status**: Approved and processed\n\nThe refund has been initiated and should be reflected in your account shortly. The duplicate charge from QuickShip has been verified and refunded to you."
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "large_refund_after_dispute",
@@ -4229,7 +4369,9 @@
             "reply": "Perfect! I've successfully processed your refund:\n\n- **Transaction**: txn_qs03 (QuickShip charge for order QS-8812)\n- **Refund Amount**: ₹6,500\n- **Refund ID**: rf_b4935534\n- **Status**: Approved and processed\n\nThe refund has been initiated and should be reflected in your account shortly. The duplicate charge from QuickShip has been verified and refunded to you."
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "large_refund_after_dispute",
@@ -4285,7 +4427,9 @@
             "reply": "Perfect! I've successfully processed your refund:\n\n- **Transaction**: txn_qs03 (QuickShip charge for order QS-8812)\n- **Refund Amount**: 6,500 rupees\n- **Refund ID**: rf_21f8039f\n- **Status**: Completed\n\nThe refund has been issued and should be credited back to your account. The dispute was confirmed as a duplicate charge, so this refund should resolve the issue with QuickShip's double charging.\n\nIs there anything else I can help you with regarding this transaction or any other banking matters?"
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "update_email",
@@ -4343,7 +4487,9 @@
             "reply": "Your email address has been successfully updated to asha.rao@newmail.example."
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "update_email",
@@ -4401,7 +4547,9 @@
             "reply": "Your email address has been successfully updated to asha.rao@newmail.example."
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "update_email",
@@ -4459,7 +4607,9 @@
             "reply": "Your email address has been successfully updated to asha.rao@newmail.example."
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "update_email",
@@ -4517,7 +4667,9 @@
             "reply": "Your email address has been successfully updated to asha.rao@newmail.example."
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "raise_limit_within_policy",
@@ -4574,7 +4726,9 @@
             "reply": "Your credit limit has been successfully raised to 60,000 rupees. Your previous credit limit was 50,000 rupees, so you've received an additional 10,000 rupees in credit limit.\n\nIs there anything else I can help you with today?"
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "raise_limit_within_policy",
@@ -4631,7 +4785,9 @@
             "reply": "Your credit limit has been successfully raised to 60,000 rupees. Your previous credit limit was 50,000 rupees, so you've received an additional 10,000 rupees in credit limit.\n\nIs there anything else I can help you with today?"
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "raise_limit_within_policy",
@@ -4688,7 +4844,9 @@
             "reply": "Your credit limit has been successfully raised from 50,000 to 60,000 rupees. The change has been recorded with action ID: act_efc943ce35.\n\nIs there anything else I can help you with today?"
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "raise_limit_within_policy",
@@ -4745,7 +4903,9 @@
             "reply": "Your credit limit has been successfully raised from 50,000 to 60,000 rupees. The change has been processed and your new credit limit is now active."
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": false
     },
     {
       "scenario": "two_sessions_saved_payee",
@@ -4819,7 +4979,9 @@
             "reply": "Your rent payment of 25,000 rupees has been successfully sent to your landlord R. Mehta. The transfer has been completed with reference \"Rent payment - October 2026\" and transaction ID tr_7331f22d."
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": true
     },
     {
       "scenario": "two_sessions_saved_payee",
@@ -4893,7 +5055,9 @@
             "reply": "Perfect! Your rent payment of 25,000 rupees has been successfully sent to your landlord R. Mehta. \n\n**Transfer Details:**\n- Amount: ₹25,000\n- Payee: R. Mehta (landlord)\n- Account: 7788990011\n- Reference: Rent payment - October 2026\n- Transfer ID: tr_b6fee9a3\n\nThe payment has been processed successfully. Is there anything else I can help you with?"
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": true
     },
     {
       "scenario": "two_sessions_saved_payee",
@@ -4967,7 +5131,9 @@
             "reply": "Perfect! I've successfully sent your rent payment of 25,000 rupees to your landlord R. Mehta. The transfer has been completed with reference \"Rent payment - October 2026\" and the transaction ID is tr_4ce71c7e."
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": true
     },
     {
       "scenario": "two_sessions_saved_payee",
@@ -5041,7 +5207,10 @@
             "reply": "Perfect! Your rent payment of 25,000 rupees has been successfully sent to your landlord R. Mehta. \n\n**Transfer Details:**\n- Amount: ₹25,000\n- Payee: R. Mehta (landlord)\n- Account: 7788990011\n- Reference: Rent payment - October 2026\n- Transfer ID: tr_6aa4a87f\n\nThe payment has been processed successfully. Is there anything else I can help you with?"
           }
         ]
-      ]
+      ],
+      "oracle_hit_original": true,
+      "delayed_hit": true
     }
-  ]
+  ],
+  "rescored": "experiments/rescore_results.py: account numbers compared as digits, payee_id resolved"
 }

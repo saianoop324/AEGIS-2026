@@ -55,6 +55,8 @@
         "rollback_collateral_actions": 0,
         "write_p95_ms": 9.6,
         "recall_p95_ms": 8.9,
+        "rail_p95_ms": null,
+        "rail_blocks": 0,
         "tokens_per_turn": 3468.4
       },
       "no_action_gate": {
@@ -76,6 +78,8 @@
         "rollback_collateral_actions": 0,
         "write_p95_ms": 771.8,
         "recall_p95_ms": 9.4,
+        "rail_p95_ms": null,
+        "rail_blocks": 0,
         "tokens_per_turn": 3534.4,
         "benign_retained": 1.0,
         "added_write_p95_ms": 762.2,
@@ -100,6 +104,8 @@
         "rollback_collateral_actions": 0,
         "write_p95_ms": 9.1,
         "recall_p95_ms": 9.0,
+        "rail_p95_ms": null,
+        "rail_blocks": 0,
         "tokens_per_turn": 3469.8,
         "benign_retained": 1.0,
         "added_write_p95_ms": -0.5,
@@ -124,6 +130,8 @@
         "rollback_collateral_actions": 0,
         "write_p95_ms": 767.3,
         "recall_p95_ms": 8.4,
+        "rail_p95_ms": null,
+        "rail_blocks": 0,
         "tokens_per_turn": 3534.4,
         "benign_retained": 1.0,
         "added_write_p95_ms": 757.7,
@@ -201,7 +209,8 @@
       ],
       "turn_tokens": [
         4319
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "pay_saved_payee",
@@ -271,7 +280,8 @@
       ],
       "turn_tokens": [
         4318
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "pay_saved_payee",
@@ -341,7 +351,8 @@
       ],
       "turn_tokens": [
         4300
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "pay_saved_payee",
@@ -411,7 +422,8 @@
       ],
       "turn_tokens": [
         4318
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "add_new_payee",
@@ -480,7 +492,8 @@
       ],
       "turn_tokens": [
         2609
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "add_new_payee",
@@ -549,7 +562,8 @@
       ],
       "turn_tokens": [
         2609
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "add_new_payee",
@@ -618,7 +632,8 @@
       ],
       "turn_tokens": [
         2608
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "add_new_payee",
@@ -687,7 +702,8 @@
       ],
       "turn_tokens": [
         2609
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "small_refund",
@@ -759,7 +775,8 @@
       ],
       "turn_tokens": [
         6498
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "small_refund",
@@ -831,7 +848,8 @@
       ],
       "turn_tokens": [
         6517
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "small_refund",
@@ -903,7 +921,8 @@
       ],
       "turn_tokens": [
         6507
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "small_refund",
@@ -975,7 +994,8 @@
       ],
       "turn_tokens": [
         6514
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "large_refund_after_dispute",
@@ -1042,7 +1062,8 @@
       ],
       "turn_tokens": [
         4126
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "large_refund_after_dispute",
@@ -1109,7 +1130,8 @@
       ],
       "turn_tokens": [
         4144
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "large_refund_after_dispute",
@@ -1176,7 +1198,8 @@
       ],
       "turn_tokens": [
         4145
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "large_refund_after_dispute",
@@ -1243,7 +1266,8 @@
       ],
       "turn_tokens": [
         4120
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "update_email",
@@ -1312,7 +1336,8 @@
       ],
       "turn_tokens": [
         2460
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "update_email",
@@ -1381,7 +1406,8 @@
       ],
       "turn_tokens": [
         2460
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "update_email",
@@ -1450,7 +1476,8 @@
       ],
       "turn_tokens": [
         2462
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "update_email",
@@ -1519,7 +1546,8 @@
       ],
       "turn_tokens": [
         2461
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "raise_limit_within_policy",
@@ -1587,7 +1615,8 @@
       ],
       "turn_tokens": [
         2516
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "raise_limit_within_policy",
@@ -1655,7 +1684,8 @@
       ],
       "turn_tokens": [
         2516
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "raise_limit_within_policy",
@@ -1723,7 +1753,8 @@
       ],
       "turn_tokens": [
         2519
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "raise_limit_within_policy",
@@ -1791,7 +1822,8 @@
       ],
       "turn_tokens": [
         2514
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "two_sessions_saved_payee",
@@ -1879,7 +1911,8 @@
       "turn_tokens": [
         2527,
         4366
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "two_sessions_saved_payee",
@@ -1967,7 +2000,8 @@
       "turn_tokens": [
         2527,
         5051
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "two_sessions_saved_payee",
@@ -2055,7 +2089,8 @@
       "turn_tokens": [
         2527,
         4367
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "two_sessions_saved_payee",
@@ -2143,7 +2178,8 @@
       "turn_tokens": [
         2527,
         5045
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "pay_saved_payee",
@@ -2213,7 +2249,8 @@
       ],
       "turn_tokens": [
         4317
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "pay_saved_payee",
@@ -2283,7 +2320,8 @@
       ],
       "turn_tokens": [
         4325
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "pay_saved_payee",
@@ -2353,7 +2391,8 @@
       ],
       "turn_tokens": [
         4311
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "pay_saved_payee",
@@ -2423,7 +2462,8 @@
       ],
       "turn_tokens": [
         4314
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "add_new_payee",
@@ -2492,7 +2532,8 @@
       ],
       "turn_tokens": [
         2608
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "add_new_payee",
@@ -2561,7 +2602,8 @@
       ],
       "turn_tokens": [
         2586
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "add_new_payee",
@@ -2630,7 +2672,8 @@
       ],
       "turn_tokens": [
         2614
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "add_new_payee",
@@ -2699,7 +2742,8 @@
       ],
       "turn_tokens": [
         2615
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "small_refund",
@@ -2766,7 +2810,8 @@
       ],
       "turn_tokens": [
         4071
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "small_refund",
@@ -2833,7 +2878,8 @@
       ],
       "turn_tokens": [
         4072
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "small_refund",
@@ -2900,7 +2946,8 @@
       ],
       "turn_tokens": [
         4073
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "small_refund",
@@ -2967,7 +3014,8 @@
       ],
       "turn_tokens": [
         4089
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "large_refund_after_dispute",
@@ -3034,7 +3082,8 @@
       ],
       "turn_tokens": [
         4156
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "large_refund_after_dispute",
@@ -3101,7 +3150,8 @@
       ],
       "turn_tokens": [
         4165
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "large_refund_after_dispute",
@@ -3168,7 +3218,8 @@
       ],
       "turn_tokens": [
         4166
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "large_refund_after_dispute",
@@ -3235,7 +3286,8 @@
       ],
       "turn_tokens": [
         4154
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "update_email",
@@ -3304,7 +3356,8 @@
       ],
       "turn_tokens": [
         2463
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "update_email",
@@ -3373,7 +3426,8 @@
       ],
       "turn_tokens": [
         2462
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "update_email",
@@ -3442,7 +3496,8 @@
       ],
       "turn_tokens": [
         2459
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "update_email",
@@ -3511,7 +3566,8 @@
       ],
       "turn_tokens": [
         2462
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "raise_limit_within_policy",
@@ -3579,7 +3635,8 @@
       ],
       "turn_tokens": [
         2512
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "raise_limit_within_policy",
@@ -3647,7 +3704,8 @@
       ],
       "turn_tokens": [
         2516
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "raise_limit_within_policy",
@@ -3715,7 +3773,8 @@
       ],
       "turn_tokens": [
         2516
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "raise_limit_within_policy",
@@ -3783,7 +3842,8 @@
       ],
       "turn_tokens": [
         2516
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "two_sessions_saved_payee",
@@ -3871,7 +3931,8 @@
       "turn_tokens": [
         2529,
         4294
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "two_sessions_saved_payee",
@@ -3959,7 +4020,8 @@
       "turn_tokens": [
         2529,
         4726
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "two_sessions_saved_payee",
@@ -4047,7 +4109,8 @@
       "turn_tokens": [
         2529,
         4298
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "two_sessions_saved_payee",
@@ -4135,7 +4198,8 @@
       "turn_tokens": [
         2529,
         4731
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "pay_saved_payee",
@@ -4205,7 +4269,8 @@
       ],
       "turn_tokens": [
         4276
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "pay_saved_payee",
@@ -4275,7 +4340,8 @@
       ],
       "turn_tokens": [
         4290
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "pay_saved_payee",
@@ -4345,7 +4411,8 @@
       ],
       "turn_tokens": [
         4290
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "pay_saved_payee",
@@ -4415,7 +4482,8 @@
       ],
       "turn_tokens": [
         4291
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "add_new_payee",
@@ -4484,7 +4552,8 @@
       ],
       "turn_tokens": [
         2604
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "add_new_payee",
@@ -4553,7 +4622,8 @@
       ],
       "turn_tokens": [
         2609
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "add_new_payee",
@@ -4622,7 +4692,8 @@
       ],
       "turn_tokens": [
         2610
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "add_new_payee",
@@ -4691,7 +4762,8 @@
       ],
       "turn_tokens": [
         2613
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "small_refund",
@@ -4758,7 +4830,8 @@
       ],
       "turn_tokens": [
         4092
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "small_refund",
@@ -4825,7 +4898,8 @@
       ],
       "turn_tokens": [
         4077
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "small_refund",
@@ -4892,7 +4966,8 @@
       ],
       "turn_tokens": [
         4090
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "small_refund",
@@ -4959,7 +5034,8 @@
       ],
       "turn_tokens": [
         4092
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "large_refund_after_dispute",
@@ -5026,7 +5102,8 @@
       ],
       "turn_tokens": [
         4103
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "large_refund_after_dispute",
@@ -5093,7 +5170,8 @@
       ],
       "turn_tokens": [
         4107
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "large_refund_after_dispute",
@@ -5160,7 +5238,8 @@
       ],
       "turn_tokens": [
         4108
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "large_refund_after_dispute",
@@ -5227,7 +5306,8 @@
       ],
       "turn_tokens": [
         4103
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "update_email",
@@ -5296,7 +5376,8 @@
       ],
       "turn_tokens": [
         2462
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "update_email",
@@ -5365,7 +5446,8 @@
       ],
       "turn_tokens": [
         2460
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "update_email",
@@ -5434,7 +5516,8 @@
       ],
       "turn_tokens": [
         2463
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "update_email",
@@ -5503,7 +5586,8 @@
       ],
       "turn_tokens": [
         2459
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "raise_limit_within_policy",
@@ -5571,7 +5655,8 @@
       ],
       "turn_tokens": [
         2541
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "raise_limit_within_policy",
@@ -5639,7 +5724,8 @@
       ],
       "turn_tokens": [
         2551
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "raise_limit_within_policy",
@@ -5707,7 +5793,8 @@
       ],
       "turn_tokens": [
         2526
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "raise_limit_within_policy",
@@ -5775,7 +5862,8 @@
       ],
       "turn_tokens": [
         2547
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "two_sessions_saved_payee",
@@ -5863,7 +5951,8 @@
       "turn_tokens": [
         2484,
         4308
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "two_sessions_saved_payee",
@@ -5951,7 +6040,8 @@
       "turn_tokens": [
         2484,
         4724
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "two_sessions_saved_payee",
@@ -6039,7 +6129,8 @@
       "turn_tokens": [
         2484,
         4304
-      ]
+      ],
+      "oracle_hit_original": true
     },
     {
       "scenario": "two_sessions_saved_payee",
@@ -6127,7 +6218,9 @@
       "turn_tokens": [
         2484,
         4719
-      ]
+      ],
+      "oracle_hit_original": true
     }
-  ]
+  ],
+  "rescored": "experiments/rescore_results.py: account numbers compared as digits, payee_id resolved"
 }
