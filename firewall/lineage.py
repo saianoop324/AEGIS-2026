@@ -29,6 +29,7 @@ class NodeType(str, Enum):
     DERIVED_MEMORY = "derived_memory"
     AGENT_ACTION = "agent_action"
     QUARANTINED_EVENT = "quarantined_event"
+    OBSERVED_CONTENT = "observed_content"  # tool output the agent read in a session, before it becomes memory
 
 
 class NodeMetadata(BaseModel):
@@ -98,6 +99,32 @@ class LineageTracker:
             timestamp=time.time(),
         )
         self.save_to_disk()
+
+    def record_observation(self, obs_id: str, tenant_id: str, content: str, channel: str) -> None:
+        """Register content the agent read through a tool this session.
+
+        Actions in the same session can be driven by it before it is ever written to memory, so it
+        gets its own node; persisted_as() later links it to the memory it becomes.
+        """
+        if self.graph.has_node(obs_id):
+            return
+        self.graph.add_node(
+            obs_id,
+            node_type=NodeType.OBSERVED_CONTENT.value,
+            tenant_id=tenant_id,
+            label=f"Observed [{channel}]",
+            content=content,
+            channel=channel,
+            status="active",
+            timestamp=time.time(),
+        )
+        self.save_to_disk()
+
+    def persisted_as(self, obs_id: str, memory_id: str) -> None:
+        """Link observed content to the memory node it was stored as."""
+        if self.graph.has_node(obs_id) and self.graph.has_node(memory_id):
+            self.graph.add_edge(obs_id, memory_id, relation="persisted_as")
+            self.save_to_disk()
 
     def record_derived_memory(
         self,
@@ -238,6 +265,9 @@ class LineageTracker:
                         logger.warning(f"Vector store deletion error for {node}: {e}")
                 node_data["status"] = "rolled_back"
                 purged_memories.append(node)
+
+            elif ntype == NodeType.OBSERVED_CONTENT.value:
+                node_data["status"] = "rolled_back"  # not stored in the vector store, nothing to purge
 
             elif ntype == NodeType.AGENT_ACTION.value:
                 revoked_actions.append(node)

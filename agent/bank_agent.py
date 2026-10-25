@@ -13,8 +13,10 @@ Arms switch MemGuard's layers on and off so each one's contribution can be measu
     memguard           write gate + read gate + action gate enforced
 """
 
+import hashlib
 import json
 import logging
+import re
 import time
 import uuid
 from dataclasses import dataclass, field
@@ -28,7 +30,7 @@ from firewall.lineage import LineageTracker
 from firewall.read_gate import MemGuardReadGate
 from firewall.write_gate import MemGuardWriteGate
 from sandbox.bank_db import BankDB
-from sandbox.bank_tools import BankTools, Session, TOOL_SCHEMAS, SENSITIVE_TOOLS
+from sandbox.bank_tools import BankTools, Session, TOOL_SCHEMAS, SENSITIVE_TOOLS, digits, to_amount
 from store.vector_store import ProvenanceEnvelope, QdrantVectorStoreWrapper
 
 logger = logging.getLogger(__name__)
@@ -87,6 +89,16 @@ class ChatClient:
         return data["choices"][0]["message"]
 
 
+def _numbers(text: str) -> set:
+    """Numbers in free text with separators inside them removed ('Rs 25,000' -> '25000')."""
+    return set(re.findall(r"\d+", re.sub(r"(?<=\d)[\s,\-](?=\d)", "", text or "")))
+
+
+def mentions_any(text: str, values: List[str]) -> bool:
+    nums, low = _numbers(text), (text or "").lower()
+    return any((v in nums) if v.isdigit() else (v in low) for v in values)
+
+
 @dataclass
 class ToolCallRecord:
     tool: str
@@ -138,6 +150,29 @@ class BankDeskAgent:
                  + "\n".join(f"- {m.text}" for m in mems)) if mems else ""
         return block, mems
 
+    def _obs_id(self, text: str) -> str:
+        return f"obs_{self.memory_tenant}_{hashlib.sha1(text.encode('utf-8')).hexdigest()[:12]}"
+
+    def _action_values(self, args: Dict[str, Any]) -> List[str]:
+        """The identifying values of a sensitive call, used to find which memories drove it."""
+        values = []
+        for key, v in args.items():
+            if key in ("reference", "field") or v in (None, ""):
+                continue  # free text and enum-like fields would match almost anything
+            if key == "amount":
+                amount = to_amount(v)
+                if amount >= 100:
+                    values.append(str(amount))
+            elif len(digits(v)) >= 6:
+                values.append(digits(v))
+            else:
+                values.append(str(v).strip().lower())
+        if args.get("payee_id"):  # a payee the agent added is identified by its account number
+            payee = self.db.one("SELECT account_number FROM payees WHERE payee_id=?", (args["payee_id"],))
+            if payee:
+                values.append(payee["account_number"])
+        return [v for v in values if v]
+
     def _store(self, channel: ChannelType, text: str) -> None:
         if not text or text in self._stored_texts:
             return
@@ -159,6 +194,7 @@ class BankDeskAgent:
         self.write_ms.append((time.perf_counter() - t0) * 1000)
         self.lineage.record_root_memory(env.memory_id, self.memory_tenant, text, channel.value,
                                         env.trust_tier, is_quarantined=quarantined)
+        self.lineage.persisted_as(self._obs_id(text), env.memory_id)
 
     # ------------------------------------------------------------------ session
     def run_session(self, session: Session, user_turns: List[str]) -> List[TurnRecord]:
@@ -168,6 +204,7 @@ class BankDeskAgent:
         history: List[Dict[str, Any]] = []
         ctx = GateContext(session.tenant_id, session.customer_id, session.verified)
         turns: List[TurnRecord] = []
+        observed: Dict[str, str] = {}  # lineage id -> tool output read so far this session
 
         for user_text in user_turns:
             ctx.user_texts.append(user_text)
@@ -203,10 +240,19 @@ class BankDeskAgent:
                     result = tools.invoke(name, args,
                                           held_reasons=verdict.reasons if not verdict.allowed else None,
                                           monitor_reasons=verdict.reasons if verdict.allowed else None)
+                    for channel, text in session.observed[len(observed):]:
+                        oid = self._obs_id(text)
+                        observed[oid] = text
+                        self.lineage.record_observation(oid, self.memory_tenant, text, channel.value)
                     if name in SENSITIVE_TOOLS:
-                        consumed = verdict.supporting_memory_ids or [m.memory_id for m in ctx.recalled]
+                        # link only what mentions the call's values; recalled-but-unrelated memories
+                        # must not become ancestors, or rollback undoes genuine actions
+                        values = self._action_values(args)
+                        consumed = set(verdict.supporting_memory_ids)
+                        consumed |= {m.memory_id for m in ctx.recalled if mentions_any(m.text, values)}
+                        consumed |= {oid for oid, text in observed.items() if mentions_any(text, values)}
                         self.lineage.record_action(result.get("action_id", f"act_{uuid.uuid4().hex[:8]}"),
-                                                   consumed, self.memory_tenant, name,
+                                                   sorted(consumed), self.memory_tenant, name,
                                                    {"args": args, "outcome": result.get("status")})
                         turn.tool_calls.append(ToolCallRecord(
                             name, args, "held" if result.get("status") == "held" else
