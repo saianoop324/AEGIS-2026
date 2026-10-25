@@ -1,0 +1,8 @@
+# Optional: the NVIDIA comparison baselines and the held-out / third-party sets (Experiments 13-15).
+#   nemoguardrails  the nemo_rails arm (agent/bank_agent.py); versions as used in Experiments 13-14
+#   datasets        experiments/exp14_write_gate_heldout.py (deepset/prompt-injections)
+#   garak           experiments/build_garak_scenarios.py (only to rebuild bank_scenarios_garak.json)
+-r requirements.txt
+nemoguardrails==0.24.1
+datasets>=2.19.0
+garak==0.17.1
