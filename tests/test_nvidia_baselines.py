@@ -9,11 +9,12 @@ import os
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))  # tests/ is not a package
 
 import agent.bank_agent as bank_agent  # noqa: E402
 from experiments.run_bank_scenarios import run_one  # noqa: E402
 from firewall import write_gate  # noqa: E402
-from tests.test_scorecard_metrics import IN_SESSION, ObeysDocumentLLM, ScriptedLLM, services  # noqa: E402
+from test_scorecard_metrics import IN_SESSION, ObeysDocumentLLM, ScriptedLLM, services  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
