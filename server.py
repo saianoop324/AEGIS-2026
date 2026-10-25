@@ -8,6 +8,7 @@ Provides:
   - POST /api/v1/redteam/run: MemGauntlet benchmark trigger.
 """
 
+import uuid
 from typing import List, Dict, Any, Optional
 from fastapi import FastAPI, HTTPException, status
 from pydantic import BaseModel, Field
@@ -113,12 +114,23 @@ def rollback_memory_blast_radius(req: RollbackRequest):
 
 @app.post("/api/v1/redteam/run")
 def run_memgauntlet(tenant_id: str = "tenant_alpha"):
-    """Execute MemGauntlet automated 5-channel x 6-attack-vector red-team run."""
-    results = harness.execute_gauntlet_run(tenant_id=tenant_id)
-    scorecard = EvaluatorEngine.evaluate_results(results)
+    """Run MemGauntlet's attacks through MemGuard, its benign controls, and the same attacks with MemGuard off.
+
+    The scorecard is computed from these three passes only (see evaluator/metrics.py). Each call writes into a
+    fresh tenant (<tenant_id>-redteam-<id>, returned as run_tenant_id): re-adding the same texts to one store makes
+    earlier copies compete for the recalled slots and skews a repeated run.
+    """
+    run_tenant = f"{tenant_id}-redteam-{uuid.uuid4().hex[:8]}"
+    results = harness.execute_gauntlet_run(tenant_id=run_tenant)
+    benign = harness.execute_benign_controls(tenant_id=run_tenant)
+    baseline = harness.execute_unprotected_baseline(tenant_id=run_tenant)
+    scorecard = EvaluatorEngine.evaluate_results(results, benign_results=benign, baseline_results=baseline)
     return {
+        "run_tenant_id": run_tenant,
         "scorecard": scorecard.model_dump(),
         "total_results": len(results),
         "results": [r.model_dump() for r in results],
+        "benign_results": [r.model_dump() for r in benign],
+        "baseline_results": [r.model_dump() for r in baseline],
     }
 
