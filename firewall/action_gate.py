@@ -23,7 +23,7 @@ import re
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
 
-from config import settings, TrustTier
+from config import settings, ChannelType, TrustTier
 from sandbox.bank_db import BankDB
 from sandbox.bank_tools import SENSITIVE_TOOLS, digits, to_amount
 
@@ -106,6 +106,13 @@ class ActionGate:
             trusted[label] = "verified customer, this session"
             return
         mems = [m for m in ctx.recalled if matches_text(m.text)]
+        # what the verified customer typed in an earlier (also verified) session is their own word, not
+        # third-party content; without this a payee added yesterday cannot be paid today (Exp 14)
+        own = [m for m in mems if m.channel == ChannelType.USER_CHAT.value]
+        if ctx.verified and own:
+            support.extend(m.memory_id for m in own)
+            trusted[label] = "verified customer, earlier session"
+            return
         support.extend(m.memory_id for m in mems)
         if any(m.trust_tier == TrustTier.TIER_1_VERIFIED.value for m in mems):
             trusted[label] = "verified memory"

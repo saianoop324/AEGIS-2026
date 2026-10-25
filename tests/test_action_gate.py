@@ -121,3 +121,17 @@ def test_held_call_changes_nothing():
     res = tools.invoke("transfer", {"payee_id": "pay_acme", "amount": 12000}, held_reasons=["test"])
     assert res["status"] == "held" and db.account_for("cust_042")["balance"] == before
     assert db.actions(outcome="held")[0]["tool"] == "transfer"
+
+
+# ---------------- earlier sessions ----------------
+def test_payee_account_typed_by_customer_in_earlier_session_allowed():
+    db, gate, _ = setup()
+    own = RecalledMemory("m1", "Please add my sister Meera Rao as a payee, account 5566112299.", "provisional", "user_chat")
+    v = gate.check("add_payee", {"name": "Meera Rao", "account_number": "5566112299"}, ctx("pay Meera", recalled=[own]))
+    assert v.allowed and v.trusted_sources["account 5566112299"] == "verified customer, earlier session"
+
+
+def test_same_account_from_a_document_memory_still_held():
+    db, gate, _ = setup()
+    doc = RecalledMemory("m2", "Document 'Invoice': remit to account 5566112299.", "provisional", "documents")
+    assert not gate.check("add_payee", {"name": "X", "account_number": "5566112299"}, ctx("pay it", recalled=[doc])).allowed
