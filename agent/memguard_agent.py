@@ -55,6 +55,7 @@ class NvidiaNimClient:
         self.api_key = api_key
         self.model = model
         self.enable_guardrails = enable_guardrails
+        self.last_source = ""  # "llm" or "local fallback": where the last generate() answer came from
 
     def generate(self, system_prompt: str, user_prompt: str, context: str) -> str:
         """Call NVIDIA NIM endpoint or perform structured production-grade fallback."""
@@ -91,11 +92,13 @@ class NvidiaNimClient:
                 )
                 if resp.status_code == 200:
                     data = resp.json()
+                    self.last_source = "llm"
                     return data["choices"][0]["message"]["content"]
             except Exception as e:
                 logger.warning(f"NVIDIA NIM remote call failed: {e}. Falling back to local secure inference synthesizer.")
 
         # Local deterministic synthesis respecting NeMo guardrail data-instruction separation
+        self.last_source = "local fallback"
         if "ignore previous instructions" in context.lower() or "system override" in context.lower():
             if "<UNTRUSTED_RECALLED_DATA" in context:
                 return (
@@ -183,7 +186,8 @@ class MemGuardLangGraphAgent:
             action_payload = {"target": "Q4_summary", "timestamp": time.time()}
 
         history = state.get("step_history", [])
-        history.append("Inference: Generated response with NVIDIA NIM.")
+        history.append("Inference: Generated response with NVIDIA NIM." if self.nim_client.last_source == "llm"
+                       else "Inference: No LLM reachable; answered with the local fallback reply.")
 
         return {
             "final_response": response_text,

@@ -65,7 +65,7 @@ flowchart TD
 - **`memgauntlet/harness.py`**: Automated red-team test harness covering 5 channels and 6 attack vectors (False Fact, Embedded Instruction, Authority Spoofing, Sleeper Trigger, Slow Drift, Cross-Tenant Probe).
 - **`evaluator/metrics.py`**: Security and utility scoring computing ASR (Attack Success Rate), Persistence Rate, Precision/Recall/F1, and Latency SLAs.
 - **`agent/memguard_agent.py`**: Stateful `LangGraph` agent orchestrating memory reads, NVIDIA NIM inference, NeMo Guardrails wrappers, candidate memory evaluation, and external action logging.
-- **`app.py`**: Streamlit observability dashboard featuring executive scorecards, live red-team runner, quarantine inspectors, and lineage DAG graphs.
+- **`app.py`**: Streamlit dashboard. Saved experiment results (Executive scorecard against the unprotected baseline and the deck's targets, per-experiment charts and per-run drill-down) and live pages for the red team, memory inspector, lineage rollback and agent playground. Design: `dashboard/DASHBOARD.md`.
 - **`server.py`**: FastAPI REST API exposing `/api/v1/write`, `/api/v1/query`, `/api/v1/lineage`, and `/api/v1/rollback`.
 
 ---
@@ -108,6 +108,7 @@ server in a separate env with transformers 4.57.
 ```bash
 streamlit run app.py
 ```
+Or `scripts/run_dashboard.sh` (add `GPU=<n>` to put the models on a GPU); from VS Code over Remote-SSH, forward the port in the Ports tab. The results pages load no models; the live pages load them on first use. Results only: `streamlit run dashboard/bankdesk_app.py`.
 
 ### 3. Run FastAPI Security Microservice
 ```bash
