@@ -1,0 +1,3 @@
+# Tests (python -m pytest tests/ -q). No GPU, model server or network needed.
+-r requirements.txt
+pytest>=8.0.0

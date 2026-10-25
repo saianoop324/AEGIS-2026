@@ -72,10 +72,37 @@ flowchart TD
 
 ## 🛠️ Getting Started
 
-### 1. Installation
+### 1. Environment
+
+Two conda envs: `aegis` for MemGuard itself, and `aegis-vllm` for the vLLM server that plays the agent's
+LLM (vLLM pins its own torch, so it is kept apart).
+
 ```bash
-pip install -r requirements.txt
+scripts/setup_env.sh                  # aegis: core + tests; caches MiniLM and nli-deberta-v3-small
+scripts/setup_env.sh --with-vllm      # also aegis-vllm (vllm 0.32.0)
+scripts/setup_env.sh --with-baselines # also NeMo Guardrails 0.24.1, datasets, garak (Experiments 13-15)
+cp .env.example .env                  # agent LLM endpoint, write-gate classifier, DEVICE
 ```
+
+torch comes from the CUDA 12.8 wheels (NVIDIA driver >= 570); on a CPU-only machine use
+`TORCH_INDEX=https://download.pytorch.org/whl/cpu scripts/setup_env.sh`. Without torch/transformers
+installed at all, the write gate falls back to its regex fast path and hash embeddings.
+
+The unit tests need no GPU, model server or network:
+```bash
+conda activate aegis && python -m pytest tests/ -q
+```
+
+Running BankDesk scenarios needs an OpenAI-compatible LLM with tool calling. Serve Qwen3.5-9B locally
+(the agent model in Experiments 10-14) and point the runner at it:
+```bash
+GPU=0 scripts/serve_llm.sh            # http://localhost:8011/v1, model name qwen3.5-9b
+python experiments/run_bank_scenarios.py experiments/bank_scenarios_benign.json --seeds 1
+```
+
+Not set up by these scripts: the NemoGuard JailbreakDetect server (`WRITE_GATE_CLASSIFIER=nemoguard`
+and the `nemo_rails` arm, `JAILBREAK_DETECT_URL`), which Experiment 13 ran from NeMo Guardrails' own
+server in a separate env with transformers 4.57.
 
 ### 2. Run Streamlit Observability Dashboard
 ```bash
