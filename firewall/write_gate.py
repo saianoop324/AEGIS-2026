@@ -372,6 +372,7 @@ class MemGuardWriteGate:
         custom_tier: Optional[TrustTier] = None,
         derived_from: Optional[List[str]] = None,
         extra_attributes: Optional[Dict[str, Any]] = None,
+        timestamp: Optional[float] = None,
     ) -> WriteGateDecision:
         """Inspect memory write request, classify hazards, sign envelope, and persist to vector store."""
         t_start = time.perf_counter()
@@ -442,7 +443,7 @@ class MemGuardWriteGate:
                 logger.error(f"Error checking neighborhood contradiction: {err}")
 
         # 5. Build Cryptographic Provenance Envelope
-        timestamp = time.time()
+        timestamp = time.time() if timestamp is None else timestamp
         signature = self.sign_envelope(
             memory_id=memory_id,
             tenant_id=tenant_id,

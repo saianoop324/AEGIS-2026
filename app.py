@@ -104,6 +104,7 @@ st.sidebar.text(f"NeMo Guardrails: {'Active' if settings.ENABLE_NEMO_GUARDRAILS 
 nav_tab = st.sidebar.radio(
     "Navigation Console",
     [
+        "🏦 BankDesk Experiments",
         "📊 Executive Scorecard",
         "⚔️ MemGauntlet Red-Team",
         "🛡️ Write-Gate & Quarantines",
@@ -112,8 +113,13 @@ nav_tab = st.sidebar.radio(
     ],
 )
 
+# ---------------- TAB 0: BANKDESK / ITDESK EXPERIMENT RESULTS ----------------
+if nav_tab == "🏦 BankDesk Experiments":
+    from dashboard.bankdesk import render as render_experiments
+    render_experiments(st)
+
 # ---------------- TAB 1: EXECUTIVE SCORECARD ----------------
-if nav_tab == "📊 Executive Scorecard":
+elif nav_tab == "📊 Executive Scorecard":
     st.header("Executive Security & Governance Scorecard")
     st.caption("Comparative analysis: Vulnerable Agent Memory Baseline vs. MemGuard Protected Architecture")
 

@@ -64,6 +64,9 @@ class Settings(BaseSettings):
     INSTRUCTION_DETECTION_THRESHOLD: float = 0.65
     LOW_TRUST_RECALL_PENALTY: float = 0.40
     QUARANTINE_SIMILARITY_THRESHOLD: float = 0.82
+    # TTL for unverified memories, applied by the read gate when an arm turns it on (memguard_ttl)
+    MEMORY_TTL_UNTRUSTED_S: float = 2 * 86400     # tool output, web, peer agents
+    MEMORY_TTL_PROVISIONAL_S: float = 7 * 86400   # customer chat, uploaded documents
 
     # NVIDIA NIM & NeMo Guardrails
     NVIDIA_NIM_API_BASE: str = "https://integrate.api.nvidia.com/v1"

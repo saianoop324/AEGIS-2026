@@ -7,11 +7,12 @@ Provides:
 """
 
 import logging
-from typing import List, Dict, Any, Optional
+import time
+from typing import Callable, List, Dict, Any, Optional
 from pydantic import BaseModel, Field
 
 from config import settings, TrustTier
-from store.vector_store import QdrantVectorStoreWrapper
+from store.vector_store import ProvenanceEnvelope, QdrantVectorStoreWrapper
 
 logger = logging.getLogger(__name__)
 
@@ -35,6 +36,8 @@ class ReadGateResponse(BaseModel):
     total_memories_evaluated: int
     untrusted_items_sandboxed: int
     execution_notes: List[str] = Field(default_factory=list)
+    tampered_dropped: List[str] = Field(default_factory=list)  # signature failed or quarantined tier
+    expired_dropped: List[str] = Field(default_factory=list)   # older than its tier's TTL
 
 
 class MemGuardReadGate:
@@ -44,9 +47,13 @@ class MemGuardReadGate:
         self,
         vector_store: QdrantVectorStoreWrapper,
         embedding_function=None,
+        verifier: Optional[Callable[[ProvenanceEnvelope], bool]] = None,
     ):
         self.vector_store = vector_store
         self._embedding_func = embedding_function or self._default_embedder()
+        # e.g. MemGuardWriteGate.verify_envelope: memories whose signed envelope does not verify
+        # were changed in the store after the write gate signed them, and are never recalled
+        self.verifier = verifier
 
     def _default_embedder(self):
         try:
@@ -66,9 +73,16 @@ class MemGuardReadGate:
         allowed_trust_tiers: Optional[List[str]] = None,
         include_quarantined: bool = False,
         strict_sandboxing: bool = True,
+        now: Optional[float] = None,
+        ttl_by_tier: Optional[Dict[str, float]] = None,
     ) -> ReadGateResponse:
-        """Execute trust-weighted memory search and construct safe prompt context."""
+        """Execute trust-weighted memory search and construct safe prompt context.
+
+        ttl_by_tier maps a trust tier to a maximum age in seconds (measured against now, default the
+        current time); older memories of that tier are not recalled.
+        """
         query_vector = self._embedding_func(query)
+        now = time.time() if now is None else now
 
         # 1. Hard pre-filtered Qdrant retrieval
         raw_hits = self.vector_store.search_memories(
@@ -80,10 +94,25 @@ class MemGuardReadGate:
         )
 
         ranked_items = []
+        tampered, expired = [], []
         for hit in raw_hits:
             payload = hit.get("payload", {})
             score = float(hit.get("score", 0.0))
             tier = payload.get("trust_tier", TrustTier.TIER_3_UNTRUSTED.value)
+
+            if self.verifier is not None:
+                try:
+                    valid = self.verifier(ProvenanceEnvelope(**payload))
+                except Exception:
+                    valid = False
+                # the quarantine flag is not signed; a signed quarantined tier is never recalled
+                if not valid or (tier == TrustTier.QUARANTINED.value and not include_quarantined):
+                    tampered.append(str(hit.get("id")))
+                    continue
+            ttl = (ttl_by_tier or {}).get(tier)
+            if ttl and now - float(payload.get("timestamp", now)) > ttl:
+                expired.append(str(hit.get("id")))
+                continue
 
             # Trust-weighting penalty adjustments
             if tier == TrustTier.TIER_1_VERIFIED.value:
@@ -154,6 +183,7 @@ class MemGuardReadGate:
             f"Evaluated {len(raw_hits)} candidate memories for tenant '{tenant_id}'.",
             f"Selected top {len(context_items)} records.",
             f"Sandboxed {sandboxed_count} records as untrusted quoted context.",
+            f"Dropped {len(tampered)} records failing provenance checks and {len(expired)} past their TTL.",
         ]
 
         return ReadGateResponse(
@@ -162,5 +192,7 @@ class MemGuardReadGate:
             total_memories_evaluated=len(raw_hits),
             untrusted_items_sandboxed=sandboxed_count,
             execution_notes=notes,
+            tampered_dropped=tampered,
+            expired_dropped=expired,
         )
 

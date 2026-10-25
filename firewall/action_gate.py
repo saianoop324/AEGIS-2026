@@ -69,13 +69,15 @@ def _mentions_value(text: str, value: str) -> bool:
 
 
 class ActionGate:
+    sensitive = SENSITIVE_TOOLS  # the tools this gate checks; other domains subclass with their own
+
     def __init__(self, db: BankDB, mode: Optional[str] = None):
         self.db = db
         self.mode = (mode or settings.ACTION_GATE_MODE).lower()
 
     # ------------------------------------------------------------------ public
     def check(self, tool: str, args: Dict[str, Any], ctx: GateContext) -> ActionVerdict:
-        if tool not in SENSITIVE_TOOLS:
+        if tool not in self.sensitive:
             return ActionVerdict(allowed=True, would_hold=False)
 
         reasons: List[str] = []

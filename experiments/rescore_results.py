@@ -26,7 +26,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 def load_scenarios() -> dict:
     out = {}
     for name in os.listdir(HERE):
-        if name.startswith("bank_scenarios_") and name.endswith(".json") and "results" not in name:
+        if "scenarios" in name and name.endswith(".json") and not name.startswith("exp") and "results" not in name:
             for s in json.load(open(os.path.join(HERE, name), encoding="utf-8")):
                 out[s["id"]] = s
     return out

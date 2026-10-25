@@ -83,6 +83,9 @@ TOOL_SCHEMAS: List[Dict[str, Any]] = [
 
 
 class BankTools:
+    schemas = TOOL_SCHEMAS      # subclasses for other domains override these two
+    sensitive = SENSITIVE_TOOLS
+
     def __init__(self, db: BankDB, session: Session):
         self.db = db
         self.s = session
@@ -92,7 +95,7 @@ class BankTools:
                monitor_reasons: Optional[List[str]] = None) -> Dict[str, Any]:
         """Run a tool. If held_reasons is non-empty the call is logged as held and not executed."""
         args = dict(args or {})
-        if name not in {t["function"]["name"] for t in TOOL_SCHEMAS}:
+        if name not in {t["function"]["name"] for t in self.schemas}:
             return {"status": "error", "message": f"Unknown tool {name}"}
         if held_reasons:
             result = {"status": "held",
@@ -106,7 +109,7 @@ class BankTools:
         except TypeError as e:
             result, undo = {"status": "error", "message": f"Bad arguments: {e}"}, None
         outcome = "executed" if result.get("status") == "ok" else result.get("status", "error")
-        if name in SENSITIVE_TOOLS or outcome != "executed":
+        if name in self.sensitive or outcome != "executed":
             result["action_id"] = self.db.log_action(self.s.session_id, self.s.tenant_id, self.s.customer_id,
                                                      name, args, outcome, monitor_reasons or [], result, undo)
         return result
@@ -245,8 +248,11 @@ class BankTools:
             self.db.execute("UPDATE accounts SET balance=balance-? WHERE account_id=?", (rf["amount"], rf["account_id"]))
             self.db.execute("UPDATE refunds SET status='reversed' WHERE refund_id=?", (undo["refund_id"],))
         elif op == "restore_field":
-            key_col = "customer_id"
+            key_col = undo.get("key_col", "customer_id")
             self.db.execute(f"UPDATE {undo['table']} SET {undo['column']}=? WHERE {key_col}=?",
                             (undo["value"], undo["key"]))
+        elif op == "delete_row":  # generic undo for an inserted row, e.g. a group membership
+            where = " AND ".join(f"{c}=?" for c in undo["where"])
+            self.db.execute(f"DELETE FROM {undo['table']} WHERE {where}", tuple(undo["where"].values()))
         self.db.execute("UPDATE action_log SET outcome='compensated' WHERE action_id=?", (action_id,))
         return {"action_id": action_id, "compensated": True, "op": op}
