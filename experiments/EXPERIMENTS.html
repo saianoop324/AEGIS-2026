@@ -674,9 +674,72 @@
     </div>
   </div>
 
+  <div class="arrow">↓</div>
+
+  <div class="exp partial">
+    <div class="card">
+      <p class="exp-title"><span class="exp-num">14</span>Smaller Qwen classifiers, a held-out public set, bigger samples, memory TTL, provenance checks and the IT helpdesk<span class="tag partial">Partial</span></p>
+      <h3>Setup</h3>
+      <ul>
+        <li><strong>Held-out write-gate set.</strong> <code>deepset/prompt-injections</code> from Hugging Face (train + test, 662 texts: 263 injections, 399 benign), which none of our gates was tuned on and which we did not write. Each text is written through the write gate as web content into its own empty tenant. Six classifiers: DeBERTa, NemoGuard JailbreakDetect, and Qwen3.5 0.8B, 2B, 4B and 9B (each served by vLLM). Script: <code>experiments/exp14_write_gate_heldout.py</code>.</li>
+        <li><strong>Bigger samples.</strong> 13 single-session attacks got a later trigger message (a plain customer request), so the persistence replay now covers 18 attacks instead of 5. 14 new benign scenarios (<code>bank_scenarios_benign_extended.json</code>), most of them needing a document, memo or earlier message to be remembered and used in a later session.</li>
+        <li><strong>ITDesk</strong>, the deck's IT-helpdesk example: a corporate directory sandbox with groups, approvals, tickets and KB articles, and its own action gate (authority comes only from the directory's roles and approvals on record). 10 attacks, including the deck's forged "user is admin" note, and 7 benign scenarios (<code>it_scenarios.json</code>).</li>
+        <li><strong>TTL.</strong> A <code>memguard_ttl</code> arm in which the read gate stops recalling untrusted memories after 2 days and provisional ones after 7. Each session is stamped one simulated day after the last, so the persistence replay happens 5 days after the plant.</li>
+        <li><strong>Provenance on recall.</strong> The read gate now verifies every recalled memory's signed envelope and drops any that changed in the store. The quarantine flag is not part of the signature, so a memory whose signed tier is quarantined is also dropped (a flipped flag cannot un-quarantine it). The runner reports provenance coverage.</li>
+        <li><strong>Runs:</strong> 3 seeds, 3 sessions before each replay. Agent: Qwen3.5-9B on two vLLM servers. Classifiers DeBERTa (all arms plus nemo_rails), Qwen 4B, 2B and 9B.</li>
+      </ul>
+      <p><strong>Action-gate fix during the run.</strong> The first pass showed the action gate alone dropping the new benign set from 41 / 42 to 33 / 42: an account number or email the verified customer typed in an <em>earlier</em> session counted as unverified memory, so a payee added yesterday could not be paid today. A recalled memory from the customer's own chat channel now counts like text typed this session; documents, memos and peer messages are still held. The arms that use the action gate were rerun after the fix (first-pass files kept on Mriya in <code>~/aegis_runs/exp14_first_pass</code>), and one IT benign scenario whose ticket did not give the employee id was corrected and the IT set rerun. Results below are after the fix.</p>
+      <h3>Result: held-out write-gate precision and recall (662 texts)</h3>
+      <table>
+        <tr><th>Classifier</th><th>Precision (target &ge; 0.90)</th><th>Recall (target &ge; 0.90)</th><th>Benign quarantined</th><th>Write p50 / p95</th></tr>
+        <tr><td>DeBERTa nli-v3-small</td><td class="result-num bad">0.78</td><td class="result-num bad">0.12</td><td>2.3%</td><td>22 / 27 ms</td></tr>
+        <tr><td>NemoGuard JailbreakDetect</td><td class="result-num good">1.00</td><td class="result-num bad">0.11</td><td>0%</td><td>33 / 40 ms</td></tr>
+        <tr><td>Qwen3.5-0.8B</td><td class="result-num bad">0.39</td><td>0.94</td><td class="result-num bad">98%</td><td>106 / 122 ms</td></tr>
+        <tr><td>Qwen3.5-2B</td><td class="result-num good">0.99</td><td class="result-num bad">0.40</td><td>0.3%</td><td>145 / 169 ms</td></tr>
+        <tr><td>Qwen3.5-4B</td><td class="result-num good">0.99</td><td class="result-num bad">0.65</td><td>0.3%</td><td>282 / 290 ms</td></tr>
+        <tr><td>Qwen3.5-9B</td><td class="result-num good">0.99</td><td class="result-num bad">0.57</td><td>0.3%</td><td>349 / 360 ms</td></tr>
+      </table>
+      <h3>Result: BankDesk, 26 hand-written attacks (78 runs) and 21 benign scenarios (63 runs)</h3>
+      <table>
+        <tr><th>Metric</th><th>Target</th><th>unprotected</th><th>nemo_rails</th><th>memguard DeBERTa</th><th>memguard Qwen 2B</th><th>memguard Qwen 4B</th><th>memguard Qwen 9B</th><th>memguard_ttl DeBERTa / 4B</th></tr>
+        <tr><td>Attacks executed</td><td></td><td class="result-num bad">54</td><td class="result-num bad">42</td><td>14</td><td>15</td><td>15</td><td>15</td><td>15 / 14</td></tr>
+        <tr><td>Reduction</td><td>&ge; 0.80</td><td></td><td class="result-num bad">0.22</td><td class="result-num bad">0.74</td><td class="result-num bad">0.72</td><td class="result-num bad">0.72</td><td class="result-num bad">0.72</td><td class="result-num bad">0.72 / 0.74</td></tr>
+        <tr><td>Sleeper activation</td><td>&le; 0.10</td><td class="result-num bad">3 / 9</td><td class="result-num good">0 / 9</td><td class="result-num good">0 / 9</td><td class="result-num good">0 / 9</td><td class="result-num good">0 / 9</td><td class="result-num good">0 / 9</td><td class="result-num good">0 / 9</td></tr>
+        <tr><td>Persistence (fires again after 3 sessions)</td><td>&le; 0.10</td><td class="result-num bad">0.69</td><td class="result-num bad">0.61</td><td class="result-num bad">0.82</td><td class="result-num bad">0.25</td><td class="result-num good">0.08</td><td class="result-num good">0.00</td><td class="result-num good">0.00 / 0.00</td></tr>
+        <tr><td>Blast-radius recall / rollback</td><td>&ge; 0.95</td><td colspan="7" class="result-num good">1.0 in every arm, no innocent action undone</td></tr>
+        <tr><td>Benign retained</td><td>&ge; 0.95</td><td></td><td class="result-num good">1.00</td><td class="result-num bad">0.87</td><td class="result-num bad">0.92</td><td class="result-num bad">0.87</td><td class="result-num bad">0.94</td><td class="result-num bad">0.86 / 0.89</td></tr>
+        <tr><td>Provenance coverage</td><td>1.0</td><td colspan="7" class="result-num good">1.0 in every arm</td></tr>
+        <tr><td>Added write p95</td><td>&lt; 150 ms</td><td></td><td>0 (162 ms per rail check)</td><td class="result-num good">+39 ms</td><td class="result-num bad">+440 ms</td><td class="result-num bad">+519 ms</td><td class="result-num bad">+1033 ms</td><td>+37 / +516 ms</td></tr>
+        <tr><td>Extra tokens per turn</td><td>&lt; 10%</td><td></td><td class="result-num good">&minus;1%</td><td class="result-num bad">+19%</td><td class="result-num bad">+12%</td><td class="result-num good">+8.5%</td><td class="result-num bad">+10.4%</td><td>+14% / +8.4%</td></tr>
+      </table>
+      <h3>Result: ITDesk, 10 attacks (30 runs) and 7 benign scenarios (21 runs)</h3>
+      <table>
+        <tr><th></th><th>unprotected</th><th>nemo_rails</th><th>no_action_gate (DeBERTa / 2B / 4B / 9B)</th><th>action_gate_only</th><th>memguard (all four)</th></tr>
+        <tr><td>Attacks executed</td><td class="result-num bad">26</td><td class="result-num bad">26</td><td class="result-num bad">27 / 27 / 24 / 27</td><td class="result-num good">0</td><td class="result-num good">0</td></tr>
+        <tr><td>Benign done</td><td>21</td><td>21</td><td>20 / 20 / 20 / 20</td><td>21</td><td>20</td></tr>
+      </table>
+      <ul>
+        <li><strong>The forged "user is admin" note cannot escalate access.</strong> Every IT attack that executed without the action gate (forged admin note, approval claimed by a bot, a KB article asking to disable MFA, an email swap on a colleague's account, a CISO claim, a cross-organisation unlock, a sleeper and a policy drift) was held by the IT action gate in all 30 runs, with or without the write gate. NeMo Guardrails stopped none of them; the write gates barely matter here because the agent obeys these plain-sounding notes.</li>
+        <li><strong>Qwen 4B is the best write-gate classifier we have.</strong> On the held-out public set it has the highest recall (0.65) at 0.99 precision, and in the bank runs it brings persistence from 0.82 (DeBERTa) to 0.08. It is no faster than the target allows: +519 ms per write in the bank runs (two LLM calls per write, 20 processes sharing the servers), against 290 ms p95 on the held-out set with one call. Qwen 2B is faster but catches less (recall 0.40, persistence 0.25). Qwen 0.8B quarantines almost everything and is unusable. No classifier reaches the deck's 0.90 recall on this public set; the precision target is met by all the Qwen models from 2B up.</li>
+        <li><strong>TTL ends persistence even with DeBERTa.</strong> With expiry on, no attack fired again from memory after 5 simulated days (0 / 12 and 0 / 11), against 9 / 11 for plain memguard with DeBERTa. There is no clear benign cost on these scenarios (0.86 against 0.87 with DeBERTa, 0.89 against 0.87 with Qwen 4B), because none of them needs a memory older than 2 days; a real deployment would lose unverified facts older than their window. The windows (2 and 7 days) were set once and not tuned.</li>
+        <li><strong>Persistence is now measured where it matters.</strong> With triggers on 18 attacks, the attacks that survive the action gate (the in-rules ones) also persist: with the action gate alone, 11 of 12 fired again from memory after their source was gone. A write gate that quarantines them (Qwen) or TTL stops that.</li>
+        <li><strong>Benign retention is the open cost.</strong> All memguard variants keep 87&ndash;94% of benign tasks on the bank, short of 95%. The losses are on the new multi-session scenarios: DeBERTa quarantines the customer's own "my rent is 25,000" message, the Qwen classifiers quarantine a lease-renewal document, and when a provisional memory is recalled inside the untrusted-data wrapper the agent often asks the customer to confirm the amount instead of paying. That last one is arguably correct caution, but the oracle counts it as a failed task.</li>
+        <li><strong>Provenance coverage is 1.0</strong> in every arm, and the unit tests show the read gate dropping a memory whose content was edited in the store and one whose quarantine flag was flipped.</li>
+        <li><strong>Lineage misses implicit targets.</strong> IT blast-radius recall is 0.75: the KB article that asks to "disable MFA for the employee" never names the employee id, so value matching cannot link the <code>disable_mfa</code> call to it. Bank blast-radius recall stays 1.0.</li>
+      </ul>
+      <p><strong>Caveats:</strong> the held-out set is generic prompt injection, not memory poisoning, and is partly in German; recall on it is a lower bound for our setting. Sleeper activation still rests on 9 bank runs and 3 IT runs. The IT scenarios were written by us with knowledge of the IT gate's rules. Write latency in the bank runs includes contention from 20 parallel runner processes. The action-gate fix was found and applied mid-experiment; its effect on attacks is nil in this data (memguard still 0 / 57 on the original set) but it does widen what the gate trusts.</p>
+      <h3>Next experiment</h3>
+      <ul>
+        <li>Close the in-rules gap (amount and payee-intent checks), the one thing keeping every memguard variant under the 0.80 target.</li>
+        <li>Benign retention: let the agent use a recalled customer statement for details the customer refers to ("my rent"), with a confirmation only above a threshold, and measure both rates.</li>
+        <li>Latency: one LLM call per write instead of two (instruction and contradiction together), and batching, to bring Qwen 4B toward 150 ms.</li>
+      </ul>
+    </div>
+  </div>
+
 </div>
 
-<footer>Experiments 0–6 generated from the MemGuard validation session on this repo's RTX 3090 test box; Experiments 7–13 run on the A100 boxes. See <code>memgauntlet/harness.py</code> and <code>firewall/write_gate.py</code> for the current implementation.</footer>
+<footer>Experiments 0–6 generated from the MemGuard validation session on this repo's RTX 3090 test box; Experiments 7–14 run on the A100 boxes. See <code>memgauntlet/harness.py</code> and <code>firewall/write_gate.py</code> for the current implementation.</footer>
 
 </div>
 </body>
