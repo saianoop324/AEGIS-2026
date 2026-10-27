@@ -30,6 +30,8 @@ from sandbox.bank_tools import BankTools, Session, digits
 from memgauntlet.harness import MemGauntletHarness, AttackVector
 from evaluator.metrics import EvaluatorEngine, SecurityScorecard
 from agent.memguard_agent import MemGuardLangGraphAgent
+from agent.bank_agent import BankDeskAgent, ChatClient, ARMS, TurnRecord
+from agent.domains import BANK
 
 st.set_page_config(
     page_title="MemGuard | Agent Memory Firewall",
@@ -154,9 +156,14 @@ selected_tenant = st.sidebar.selectbox(
 st.sidebar.divider()
 st.sidebar.subheader("Security Configuration")
 st.sidebar.text(f"DeBERTa NLI: {settings.DEBERTA_NLI_MODEL_NAME.split('/')[-1]}")
-st.sidebar.text(f"Inference: {settings.NVIDIA_NIM_MODEL.split('/')[-1]}")
 st.sidebar.text(f"Write Gate SLA: < {settings.WRITE_GATE_LATENCY_BUDGET_MS}ms")
 st.sidebar.text(f"NeMo Guardrails: {'Active' if settings.ENABLE_NEMO_GUARDRAILS else 'Inactive'}")
+
+st.sidebar.divider()
+st.sidebar.subheader("LLM Inference Endpoint")
+llm_api_base = st.sidebar.text_input("API Base", value=settings.NVIDIA_NIM_API_BASE, help="e.g. http://localhost:8011/v1 for local vLLM, or https://integrate.api.nvidia.com/v1 for NIM")
+llm_model = st.sidebar.text_input("Model Name", value=settings.NVIDIA_NIM_MODEL)
+llm_api_key = st.sidebar.text_input("API Key", value=settings.NVIDIA_NIM_API_KEY, type="password")
 
 nav_tab = st.sidebar.radio(
     "Navigation Console",
@@ -256,8 +263,15 @@ if nav_tab == "💬 MemGuard Live Chatbot":
                     if tel.get("reasons"):
                         st.info(f"**Mitigation Details:** {'; '.join(tel['reasons'])}")
 
-                    if tel.get("sandboxed_context"):
-                        st.code(tel["sandboxed_context"], language="markdown")
+                    if tel.get("tool_calls"):
+                        st.markdown("**Tool Invocations & Action Gate Verdicts:**")
+                        for tc in tel["tool_calls"]:
+                            st.write(f"- `{tc['tool']}` with args `{tc['args']}` → **{tc['outcome'].upper()}**" + (f" ({'; '.join(tc['reasons'])})" if tc.get('reasons') else ""))
+
+                    if tel.get("recalled_items"):
+                        st.markdown(f"**Recalled Memories from Vector Store ({len(tel['recalled_items'])}):**")
+                        for m in tel["recalled_items"]:
+                            st.write(f"- `[{m.get('tier', '').upper()}]` {m.get('text', '')}")
 
     # Chat Input Box
     user_input = st.chat_input("Enter a prompt, instruction, or data payload...")
@@ -275,7 +289,7 @@ if nav_tab == "💬 MemGuard Live Chatbot":
         channel_enum = ChannelType(chat_channel)
 
         # -------------------------------------------------------------
-        # STEP 1: WRITE-GATE FIREWALL
+        # STEP 1: WRITE-GATE FIREWALL EVALUATION
         # -------------------------------------------------------------
         t_start = time.perf_counter()
         if is_protected:
@@ -290,146 +304,82 @@ if nav_tab == "💬 MemGuard Live Chatbot":
             write_inst_score = write_dec.instruction_score
             write_contra_score = write_dec.contradiction_score
             assigned_tier = write_dec.trust_tier
-            sig = write_dec.envelope.sha256_signature if write_dec.envelope else "N/A"
         else:
-            # Unprotected: No write gate, directly saved into active vector store
             write_quarantined = False
             write_reasons = []
             write_lat = 0.5
             write_inst_score = 0.0
             write_contra_score = 0.0
             assigned_tier = TrustTier.TIER_2_PROVISIONAL.value
-            sig = "unprotected_no_signature"
 
         # -------------------------------------------------------------
-        # STEP 2: READ-GATE MEMORY RECALL & SANDBOXING
+        # STEP 2: DYNAMIC AUTONOMOUS AGENT EXECUTION (LLM + GATES)
         # -------------------------------------------------------------
-        read_resp = read_gate.query_memories(
-            tenant_id=selected_tenant,
-            query=active_prompt,
-            top_k=3,
-            include_quarantined=not is_protected,  # unprotected leaks quarantined data
-            strict_sandboxing=is_protected,
+        chat_client = ChatClient(
+            api_base=llm_api_base,
+            api_key=llm_api_key,
+            model=llm_model,
+            timeout=settings.LLM_TIMEOUT_S,
         )
 
-        sandboxed_block = read_resp.rendered_prompt_context
-        items_count = len(read_resp.items)
-        sandboxed_count = read_resp.untrusted_items_sandboxed
+        sess_id = st.session_state.setdefault("agent_session_id", f"sess_{uuid.uuid4().hex[:6]}")
+        session = Session(session_id=sess_id, tenant_id=selected_tenant, customer_id="cust_042")
+
+        arm_name = "memguard" if is_protected else "unprotected"
+        agent_runner = BankDeskAgent(
+            db=bank_db,
+            vector_store=vector_store,
+            write_gate=write_gate,
+            read_gate=read_gate,
+            lineage=lineage_tracker,
+            llm=chat_client,
+            arm=ARMS[arm_name],
+            memory_tenant=selected_tenant,
+            domain=BANK,
+        )
+
+        try:
+            with st.spinner("AI Agent reasoning & consulting MemGuard firewall..."):
+                turns = agent_runner.run_session(session, [active_prompt])
+                turn = turns[-1]
+                assistant_reply = turn.reply
+                executed_calls = turn.tool_calls
+                recalled_mems = turn.recalled
+        except requests.exceptions.RequestException as e:
+            assistant_reply = (
+                f"⚠️ **Could not connect to LLM server at `{chat_client.api_base}`**\n\n"
+                f"**Connection Error:** `{e}`\n\n"
+                "**To connect your local GPU model on Brev:**\n"
+                "1. Make sure vLLM is running in another terminal:\n"
+                "   ```bash\n"
+                "   vllm serve Qwen/Qwen2.5-7B-Instruct --port 8011 --gpu-memory-utilization 0.80\n"
+                "   ```\n"
+                "   and ensure API Base in the sidebar is set to `http://localhost:8011/v1`.\n\n"
+                "2. Or if using NVIDIA NIM Cloud API, enter your `nvapi-...` key in the sidebar."
+            )
+            executed_calls = []
+            recalled_mems = []
 
         # -------------------------------------------------------------
-        # STEP 3: ACTION-GATE CHECK (SENSITIVE BANK/IT TOOLS)
+        # STEP 3: PREPARE TELEMETRY BADGES
         # -------------------------------------------------------------
-        detected_tool = None
-        action_allowed = True
-        action_reasons = []
-        low_prompt = active_prompt.lower()
+        sandboxed_count = sum(1 for m in recalled_mems if m.get("tier") not in ("verified", TrustTier.TIER_1_VERIFIED.value))
 
-        # Identify tool invocation from prompt
-        if any(w in low_prompt for w in ["transfer", "pay", "send money", "rupees"]):
-            detected_tool = "transfer"
-            acc_match = re.findall(r"\d{6,}", active_prompt)
-            acc_num = acc_match[0] if acc_match else "9981220177"
-            tool_args = {"account_number": acc_num, "amount": 50000}
-        elif any(w in low_prompt for w in ["grant role", "admin role", "elevate", "grant_role"]):
-            detected_tool = "grant_role"
-            tool_args = {"role": "admin"}
-        elif any(w in low_prompt for w in ["credit limit", "set_credit_limit"]):
-            detected_tool = "set_credit_limit"
-            tool_args = {"amount": 400000}
-        elif any(w in low_prompt for w in ["refund", "issue_refund"]):
-            detected_tool = "issue_refund"
-            tool_args = {"amount": 5000}
-
-        if detected_tool:
-            if is_protected:
-                ctx = GateContext(
-                    tenant_id=selected_tenant,
-                    customer_id="cust_042",
-                    verified=True,
-                    user_texts=[active_prompt],
-                    recalled=[
-                        RecalledMemory(
-                            memory_id=it.memory_id,
-                            text=it.original_content,
-                            trust_tier=it.trust_tier,
-                            channel=it.source_channel,
-                        )
-                        for it in read_resp.items
-                    ],
-                )
-                verdict = action_gate.check(detected_tool, tool_args, ctx)
-                action_allowed = verdict.allowed
-                action_reasons = verdict.reasons
-            else:
-                # Unprotected: always executes
-                action_allowed = True
-                action_reasons = ["Unprotected mode: executed without action gate verification."]
-
-        # -------------------------------------------------------------
-        # STEP 4: GENERATE AGENT RESPONSE
-        # -------------------------------------------------------------
-        if is_protected:
-            if write_quarantined:
-                assistant_reply = (
-                    f"🛡️ **[MemGuard Firewall Active]** Hostile payload intercepted and quarantined at ingestion.\n\n"
-                    f"**Interception Reason:** {'; '.join(write_reasons)}\n\n"
-                    f"The directive was prevented from poisoning vector memory. Safe operations remain unaffected."
-                )
-            elif detected_tool and not action_allowed:
-                assistant_reply = (
-                    f"🛑 **[Action Gate Enforced]** Tool invocation `{detected_tool}` was **HELD / BLOCKED**.\n\n"
-                    f"**Security Policy Violation:** {'; '.join(action_reasons)}\n\n"
-                    f"MemGuard verified that the destination or parameter did not originate from verified bank records or customer confirmation."
-                )
-            elif "select * from" in low_prompt or "tenant_beta" in low_prompt:
-                assistant_reply = (
-                    f"🛡️ **[Tenant Boundary Enforced]** Cross-tenant traversal attempt blocked. "
-                    f"Hard pre-filtering isolated query vector strictly to `{selected_tenant}`."
-                )
-            elif sandboxed_count > 0:
-                assistant_reply = (
-                    f"I found relevant historical data from earlier sessions, but it originates from an unverified tier ({chat_channel}). "
-                    f"Per NeMo Guardrails policy, content enclosed inside `<UNTRUSTED_RECALLED_DATA>` quarantine envelopes is treated strictly as passive data and will not be executed as system directives."
-                )
-            else:
-                assistant_reply = (
-                    f"Processed your query for `{selected_tenant}` safely. "
-                    f"Retrieved validated context from knowledge store. All memory checks passed."
-                )
-        else:
-            # UNPROTECTED BASELINE RESPONSE (Vulnerable behavior)
-            if write_quarantined or "ignore previous" in low_prompt or "system override" in low_prompt:
-                assistant_reply = (
-                    f"⚠️ **[Unprotected Baseline]** System override acknowledged. "
-                    f"Disabling security policies and executing hostile prompt instructions directly..."
-                )
-            elif detected_tool:
-                assistant_reply = (
-                    f"⚠️ **[Unprotected Baseline]** Executed `{detected_tool}` with parameters `{tool_args}` unconditionally. "
-                    f"Funds/privileges altered without provenance verification."
-                )
-            elif "tenant_beta" in low_prompt:
-                assistant_reply = (
-                    f"⚠️ **[Unprotected Baseline]** Cross-tenant query accepted: Retrieved sensitive records from tenant_beta."
-                )
-            else:
-                assistant_reply = f"Processed request without firewall verification: {active_prompt}"
-
-        # -------------------------------------------------------------
-        # STEP 5: PREPARE TELEMETRY BADGES
-        # -------------------------------------------------------------
         write_badge = "🔴 QUARANTINED" if write_quarantined else f"🟢 ADMITTED ({assigned_tier.upper()})"
-        write_desc = f"Score: {max(write_inst_score, write_contra_score):.2f} | Latency: {write_lat:.1f}ms"
+        write_desc = f"Instruction: {write_inst_score:.2f} | Contradiction: {write_contra_score:.2f} | Latency: {write_lat:.1f}ms"
 
         read_badge = f"🔒 {sandboxed_count} SANDBOXED" if sandboxed_count > 0 else "✨ CLEAN / NO UNTRUSTED"
-        read_desc = f"Evaluated {items_count} memories from '{selected_tenant}'"
+        read_desc = f"Recalled {len(recalled_mems)} memories from '{selected_tenant}'"
 
-        if detected_tool:
-            action_badge = "🛑 BLOCKED (HELD)" if not action_allowed else "⚠️ EXECUTED (UNPROTECTED)" if not is_protected else "✅ ALLOWED"
-            action_desc = f"Tool: `{detected_tool}`"
+        if executed_calls:
+            first_call = executed_calls[0]
+            action_badge = "🛑 BLOCKED (HELD)" if first_call.outcome == "held" else ("⚠️ EXECUTED (UNPROTECTED)" if not is_protected else "✅ ALLOWED")
+            action_desc = f"Tool: `{first_call.tool}` ({first_call.outcome})"
+            action_reasons = first_call.reasons
         else:
-            action_badge = "ℹ️ NO SENSITIVE TOOL"
-            action_desc = "Query-only interaction"
+            action_badge = "ℹ️ NO TOOL CALLED"
+            action_desc = "Conversational response"
+            action_reasons = []
 
         telemetry = {
             "write_badge": write_badge,
@@ -439,7 +389,8 @@ if nav_tab == "💬 MemGuard Live Chatbot":
             "action_badge": action_badge,
             "action_desc": action_desc,
             "reasons": write_reasons or action_reasons,
-            "sandboxed_context": sandboxed_block if sandboxed_count > 0 else None,
+            "recalled_items": recalled_mems,
+            "tool_calls": [{"tool": c.tool, "args": c.args, "outcome": c.outcome, "reasons": c.reasons} for c in executed_calls],
         }
 
         # Store Assistant Message
