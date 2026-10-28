@@ -112,7 +112,8 @@ class ChatClient:
         resp = requests.post(f"{self.api_base}/chat/completions", json=body, timeout=self.timeout,
                              headers={"Authorization": f"Bearer {self.api_key}"})
         self.latencies.append(time.perf_counter() - t0)
-        resp.raise_for_status()  # no silent fallback: a failed call must fail the run
+        if resp.status_code != 200:
+            raise requests.exceptions.HTTPError(f"{resp.status_code} Error from {self.api_base}: {resp.text}", response=resp)
         data = resp.json()
         self.last_usage = data.get("usage") or {}
         return data["choices"][0]["message"]

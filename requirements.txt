@@ -1,20 +1,33 @@
+# ==============================================================================
 # MemGuard: AI Agent Memory Governance & Provenance Firewall Platform
+# Pinned for full CUDA 12 / NVIDIA RTX GPU Compatibility (Zero-Crash Setup)
+# ==============================================================================
+--extra-index-url https://download.pytorch.org/whl/cu124
+
+# Core Deep Learning & CUDA Inference Engine
+torch==2.5.1+cu124
+torchvision==0.20.1+cu124
+torchaudio==2.5.1+cu124
+vllm==0.7.3
+transformers==4.49.0
+xformers==0.0.28.post3
+
+# Agent Framework & Vector Storage
 langgraph>=0.2.0
 langchain-core>=0.3.0
 qdrant-client>=1.9.0
 sentence-transformers>=3.0.0
-transformers>=4.40.0
-torch>=2.2.0
 networkx>=3.2.0
+
+# Dashboard & APIs
 streamlit>=1.35.0
 pydantic>=2.7.0
 pydantic-settings>=2.2.0
 fastapi>=0.111.0
 uvicorn>=0.30.0
-numpy>=1.26.0
+numpy>=1.26.0,<2.0.0
 openai>=1.30.0
 requests>=2.31.0
 python-dotenv>=1.0.1
 plotly>=5.22.0
 matplotlib>=3.8.0
-

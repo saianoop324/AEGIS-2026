@@ -68,10 +68,10 @@ class Settings(BaseSettings):
     MEMORY_TTL_UNTRUSTED_S: float = 2 * 86400     # tool output, web, peer agents
     MEMORY_TTL_PROVISIONAL_S: float = 7 * 86400   # customer chat, uploaded documents
 
-    # NVIDIA NIM & NeMo Guardrails
-    NVIDIA_NIM_API_BASE: str = "https://integrate.api.nvidia.com/v1"
-    NVIDIA_NIM_API_KEY: str = "nvapi-mock-key-or-env"
-    NVIDIA_NIM_MODEL: str = "meta/llama-3.1-70b-instruct"
+    # NVIDIA NIM & NeMo Guardrails / Local vLLM
+    NVIDIA_NIM_API_BASE: str = "http://localhost:8011/v1"
+    NVIDIA_NIM_API_KEY: str = "local"
+    NVIDIA_NIM_MODEL: str = "Qwen/Qwen2.5-7B-Instruct"
     ENABLE_NEMO_GUARDRAILS: bool = True
     LLM_TIMEOUT_S: float = 120.0
 
